@@ -6,6 +6,7 @@ public class Logic : MonoBehaviour
     public int score = 0;
     public Text scoreText;
     public GameObject gameOverPanel;
+    public bool alive = true;
     public void addScore(int amount){
         score += amount;
         scoreText.text = score.ToString();
@@ -19,5 +20,6 @@ public class Logic : MonoBehaviour
 
     public void gameOver(){
         gameOverPanel.SetActive(true);
+        alive = false;
     }
 }
