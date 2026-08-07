@@ -105,3 +105,11 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+# Visual Studio Code local settings
+.vscode/
+
+# Unity generated solution and project files
+*.slnx
+*.sln
+*.csproj
+*.unityproj
