@@ -6,11 +6,18 @@ public class Menu : MonoBehaviour
     public GameObject GameAssets;
     public GameObject Canvas;
     public GameObject ObstacolSpwn;
+    void Awake()
+    {
+        GameAssets.SetActive(false);
+        Canvas.SetActive(false);
+        ObstacolSpwn.SetActive(false);
+        MainMenu.SetActive(true);
+    }
     public void GameStart()
     {
         GameAssets.SetActive(true);
         Canvas.SetActive(true);
-        ObstacolSpwn.SetActive(true);
+        //ObstacolSpwn.SetActive(true);
         MainMenu.SetActive(false);
     }
     public void Quitgame()
