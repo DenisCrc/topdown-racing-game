@@ -32,7 +32,6 @@ public class CarScript : MonoBehaviour
         gameObject.name = "George Russell";
         logic = FindAnyObjectByType<Logic>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        gameObject.name = "George Russell";
         
         // Ensure the particles are hidden when the game starts
     }

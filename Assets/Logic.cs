@@ -7,10 +7,6 @@ public class Logic : MonoBehaviour
     public Text scoreText;
     public GameObject gameOverPanel;
     public bool alive = true;
-    public void addScore(int amount){
-        score += amount;
-        scoreText.text = score.ToString();
-    }
 
     public void restartGame(){
         score = 0;
