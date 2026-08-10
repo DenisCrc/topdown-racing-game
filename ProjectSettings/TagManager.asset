@@ -41,6 +41,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Track
+    uniqueID: 78984635
+    locked: 0
+  - name: Player
+    uniqueID: 2151167513
+    locked: 0
   m_RenderingLayers:
   - Default
   - Layer 1
