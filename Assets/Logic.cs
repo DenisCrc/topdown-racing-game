@@ -18,4 +18,7 @@ public class Logic : MonoBehaviour
         gameOverPanel.SetActive(true);
         alive = false;
     }
+    public void MainMenu(){
+        SceneManager.LoadScene("MainMenu");
+    }
 }
