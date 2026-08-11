@@ -12,6 +12,17 @@ public class Logic : MonoBehaviour
     
     public bool isTimerRunning = false; 
 
+    void Awake()
+    {
+        if (PlayerPrefs.HasKey("HighScore"))
+        {
+            highScoreText.text = PlayerPrefs.GetFloat("HighScore").ToString("0.00");
+        }
+        else
+        {
+            highScoreText.text = "0.00";
+        }
+    }
     
     void Update()
     {

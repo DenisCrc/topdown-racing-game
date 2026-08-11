@@ -19,7 +19,7 @@ public class CarScript : MonoBehaviour
     public ParticleSystem tireSmokeParticles2;
     public float driftSmokeThreshold = 1.5f;
     public float oversteerFactor = 1.2f;
-    public float smokeLingerTime = 0.2f; // How long the smoke continues during a transition
+    public float smokeLingerTime = 0.2f; 
     private float smokeTimer = 0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -33,7 +33,7 @@ public class CarScript : MonoBehaviour
         logic = FindAnyObjectByType<Logic>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         
-        // Ensure the particles are hidden when the game starts
+        
     }
 
     // Update is called once per frame
@@ -100,18 +100,18 @@ public class CarScript : MonoBehaviour
         {
             float sidewaysSlip = Mathf.Abs(Vector2.Dot(myRigidbody.linearVelocity, transform.right));
 
-            // If we are actively drifting, reset the timer to full
+            
             if (sidewaysSlip > driftSmokeThreshold)
             {
                 smokeTimer = smokeLingerTime; 
             }
             else
             {
-                // If we are not drifting, count down the timer
+                
                 smokeTimer -= Time.fixedDeltaTime; 
             }
 
-            // Emit smoke as long as the timer is above zero
+            
             bool shouldEmit = smokeTimer > 0f;
 
             var emission1 = tireSmokeParticles1.emission;
