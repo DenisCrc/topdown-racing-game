@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Settings : MonoBehaviour
 {
@@ -36,4 +37,8 @@ public class Settings : MonoBehaviour
         PlayerPrefs.SetInt("CameraShake", CameraShakeToggle.isOn ? 1 : 0);
     }
 
+    public void BackToMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 }

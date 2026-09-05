@@ -59,7 +59,7 @@ public class Logic : MonoBehaviour
         {
             isTimerRunning = true;
         }
-        else if(time > 3f)
+        else if(time > 20f)
         {
             if (time < PlayerPrefs.GetFloat("HighScore", float.MaxValue))
             {
