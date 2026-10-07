@@ -2,6 +2,9 @@
 
 A fast-paced, 2D top-down arcade racing game built in Unity. This project features custom drift physics, dynamic particle effects, and a complete lap-timing system designed for responsive and engaging gameplay.
 
+<img width="1577" height="871" alt="image" src="https://github.com/user-attachments/assets/c7406944-fb04-4580-9acd-183318711d35" />
+
+
 ##  Features
 
 * **Custom Drift Physics:** Hand-tuned 2D vector physics that simulate realistic car handling, sliding, and drifting.
