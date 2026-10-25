@@ -65,3 +65,7 @@ crashlytics-build.properties
 /[Aa]ssets/Addressables_Temp*
 /[Aa]ssets/AddressableAssetsData/*/*.bin*
 /[Aa]ssets/Unity.VisualScripting.Generated/
+
+# Generated performance-test metadata (including Unity importer sidecars)
+/Assets/Resources/PerformanceTestRunInfo.json*
+/Assets/Resources/PerformanceTestRunSettings.json*

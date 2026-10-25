@@ -70,5 +70,4 @@ public class Logic : MonoBehaviour
         nextCheckpoint = (index + 1) % checkpointCount;
         statusText.text = nextCheckpoint == 0 ? "All gates passed - cross the finish!" : "Checkpoint " + nextCheckpoint + " / " + (checkpointCount - 1);
     }
-    public void completeLap() { PassCheckpoint(0); }
 }

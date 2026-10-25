@@ -46,8 +46,6 @@ public static class RacingProjectSetup
         foreach (string level in LevelCatalog.Scenes) UpdateRace(level, carMaterial);
         EditorBuildSettings.scenes = new[] { "MainMenu", "Garage", "Settings" }.Concat(LevelCatalog.Scenes)
             .Select(s => new EditorBuildSettingsScene("Assets/Scenes/" + s + ".unity", true)).ToArray();
-        foreach (string name in new[] { "Masina", "Masina_Left", "Masina_Right" })
-            AssetDatabase.DeleteAsset("Assets/Car/" + name + ".png");
         AssetDatabase.SaveAssets();
         EditorSceneManager.OpenScene("Assets/Scenes/MainMenu.unity");
         Debug.Log("PASTEL PROJECT SETUP COMPLETE");
@@ -123,19 +121,6 @@ public static class RacingProjectSetup
             }
             texture.Apply(); File.WriteAllBytes(texturePath, texture.EncodeToPNG()); UnityEngine.Object.DestroyImmediate(texture);
             AssetDatabase.ImportAsset(texturePath);
-        }
-        const string finishPath = "Assets/Resources/FinishStripe.png";
-        if (!File.Exists(finishPath))
-        {
-            var stripe = new Texture2D(32, 32, TextureFormat.RGBA32, false);
-            for (int y = 0; y < 32; y++) for (int x = 0; x < 32; x++)
-                stripe.SetPixel(x, y, (x / 16 + y / 4) % 2 == 0 ? theme.panel : theme.coral);
-            stripe.Apply(); File.WriteAllBytes(finishPath, stripe.EncodeToPNG()); UnityEngine.Object.DestroyImmediate(stripe);
-            AssetDatabase.ImportAsset(finishPath);
-            var importer = (TextureImporter)AssetImporter.GetAtPath(finishPath);
-            importer.textureType = TextureImporterType.Sprite; importer.spritePixelsPerUnit = 32;
-            importer.mipmapEnabled = false; importer.filterMode = FilterMode.Point;
-            importer.SaveAndReimport();
         }
         var material = AssetDatabase.LoadAssetAtPath<Material>("Assets/Resources/TireSmoke.mat");
         if (material == null)

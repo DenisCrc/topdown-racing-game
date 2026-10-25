@@ -195,9 +195,9 @@ public class RacingPlayerValidation : MonoBehaviour
                     Screen.SetResolution(1280, 720, FullScreenMode.Windowed); yield return new WaitForSeconds(.25f);
                 }
                 var gates = FindObjectsByType<RaceCheckpoint>().OrderBy(c => c.index).ToArray();
-                var finish = gates.FirstOrDefault(c => c.index == 0);
-                Vector2 finishPosition = finish != null ? (Vector2)finish.transform.position : (Vector2)FindAnyObjectByType<Trigger>().GetComponent<BoxCollider2D>().bounds.center;
-                Vector2 finishDirection = finish != null ? (Vector2)finish.transform.up : Vector2.right;
+                var finish = gates.Single(c => c.index == 0);
+                Vector2 finishPosition = (Vector2)finish.transform.position;
+                Vector2 finishDirection = (Vector2)finish.transform.up;
                 // Physical trigger crossings exercise direction checks and checkpoint ordering.
                 for (int gateIndex = 0; gateIndex <= logic.checkpointCount; gateIndex++)
                 {
