@@ -4,12 +4,12 @@ using UnityEngine.SceneManagement;
 
 public class Settings : MonoBehaviour
 {
-    [SerializeField] private Slider MasterVolumeSlider;
-    [SerializeField] private Slider MusicVolumeSlider;
-    [SerializeField] private Slider SFXVolumeSlider;
-    [SerializeField] private Toggle FullscreenToggle;
-    [SerializeField] private Toggle CameraShakeToggle;
-
+    public Slider MasterVolumeSlider;
+    public Slider MusicVolumeSlider;
+    public Slider SFXVolumeSlider;
+    public Toggle FullscreenToggle;
+    public Toggle CameraShakeToggle;
+    public Button backButton;
     void Start()
     {
         MasterVolumeSlider.SetValueWithoutNotify(PlayerPrefs.GetFloat("MasterVolume", 0.5f));
@@ -23,9 +23,8 @@ public class Settings : MonoBehaviour
         FullscreenToggle.onValueChanged.AddListener(SetFullscreen);
         CameraShakeToggle.onValueChanged.AddListener(SetCameraShake);
         AudioListener.volume = MasterVolumeSlider.value;
-        Screen.fullScreen = FullscreenToggle.isOn;
+        Menu.Focus(MasterVolumeSlider);
     }
-
     void SetMasterVolume(float value) { PlayerPrefs.SetFloat("MasterVolume", value); AudioListener.volume = value; }
     void SetMusicVolume(float value) { PlayerPrefs.SetFloat("MusicVolume", value); }
     void SetSfxVolume(float value) { PlayerPrefs.SetFloat("SFXVolume", value); }

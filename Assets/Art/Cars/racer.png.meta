@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: 6bcdca36892c18841adf0a83f093e4d0
+guid: 4bf25b5068a2f724d979c0860ae2d8f6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8338900305914560994
-    second: Masina_0
+      213: 8630520809801173524
+    second: racer_0
+  - first:
+      213: -3515489088450466698
+    second: racer_1
+  - first:
+      213: 6200738969457860022
+    second: racer_2
+  - first:
+      213: 3861461824408047630
+    second: racer_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -24,7 +33,7 @@ TextureImporter:
     heightScale: 0.25
     normalMapFilter: 0
     flipGreenChannel: 0
-  isReadable: 0
+  isReadable: 1
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
@@ -57,7 +66,7 @@ TextureImporter:
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationDetail: -1
-  textureType: 8
+  textureType: 0
   textureShape: 1
   singleChannelComponent: 0
   flipbookRows: 1
@@ -72,10 +81,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 4096
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,44 +109,113 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Masina_0
+      name: racer_0
       rect:
         serializedVersion: 2
-        x: 215
-        y: 68
-        width: 312
-        height: 603
+        x: 72
+        y: 17
+        width: 713
+        height: 671
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
+      customData:
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e1ef0986a56464c80800000000000000
-      internalID: -8338900305914560994
+      spriteID: 41ac0d633f4c5c770800000000000000
+      internalID: 8630520809801173524
       vertices: []
-      indices: 
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: racer_1
+      rect:
+        serializedVersion: 2
+        x: 865
+        y: 53
+        width: 455
+        height: 634
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67ce527cc49763fc0800000000000000
+      internalID: -3515489088450466698
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: racer_2
+      rect:
+        serializedVersion: 2
+        x: 1416
+        y: 33
+        width: 738
+        height: 655
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6bd15736d337d0650800000000000000
+      internalID: 6200738969457860022
+      vertices: []
+      indices:
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: racer_3
+      rect:
+        serializedVersion: 2
+        x: 1440
+        y: 449
+        width: 7
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData:
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e00d295021ba69530800000000000000
+      internalID: 3861461824408047630
+      vertices: []
+      indices:
       edges: []
       weights: []
     outline: []
-    customData: 
+    customData:
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID:
     internalID: 0
     vertices: []
-    indices: 
+    indices:
     edges: []
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Masina_0: -8338900305914560994
-  mipmapLimitGroupName: 
+      racer_0: 8630520809801173524
+      racer_1: -3515489088450466698
+      racer_2: 6200738969457860022
+      racer_3: 3861461824408047630
+  mipmapLimitGroupName:
   pSDRemoveMatte: 0
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+  userData:
+  assetBundleName:
+  assetBundleVariant:

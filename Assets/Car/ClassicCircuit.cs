@@ -8,9 +8,21 @@ public class ClassicCircuit : MonoBehaviour
     Material roadMaterial;
     void Awake()
     {
-        roadMaterial = new Material(Shader.Find("Sprites/Default"));
-        roadMaterial.color = new Color(0.25f, 0.28f, 0.32f);
+        roadMaterial = new Material(Resources.Load<Material>("CarMaterial"));
+        roadMaterial.color = PastelTheme.Current.road;
         GetComponent<MeshRenderer>().sharedMaterial = roadMaterial;
+        Camera.main.backgroundColor = PastelTheme.Current.background;
+        var finish = FindAnyObjectByType<Trigger>();
+        var finishCollider = finish.GetComponent<BoxCollider2D>();
+        Vector3 center = finish.transform.TransformPoint(finishCollider.offset);
+        var stripe = new GameObject("Finish Stripe");
+        stripe.transform.SetParent(transform, true);
+        stripe.transform.position = new Vector3(center.x, center.y, -1);
+        stripe.transform.localScale = new Vector3(0.3f, finishCollider.size.y, 1);
+        var stripeRenderer = stripe.AddComponent<SpriteRenderer>();
+        stripeRenderer.sprite = Resources.Load<Sprite>("FinishStripe");
+        stripeRenderer.sharedMaterial = Resources.Load<Material>("CarMaterial");
+        stripeRenderer.sortingOrder = 1;
         var logic = FindAnyObjectByType<Logic>();
         logic.checkpointCount = 2;
         var gate = new GameObject("Far Side Checkpoint");

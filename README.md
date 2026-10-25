@@ -1,46 +1,61 @@
-# Top-Down 2D Racing Game
+# Sunday Circuit
 
-A Unity arcade racer with drift handling, tire smoke, camera follow, and three time-trial circuits.
+A pastel, top-down Unity time-trial racer with three cars, three circuits, drift smoke, and per-car lap records.
 
-## Run the game
+## Open and play
 
-1. Install **Unity 6000.5.7f1** through Unity Hub (the version in `ProjectSettings/ProjectVersion.txt`).
-2. Clone this repository with Git LFS installed, then run `git lfs pull` to retrieve the sprites and fonts.
-3. Open the repository folder in Unity Hub and let Unity import the assets and packages.
+1. Install **Unity 6000.5.7f1** using Unity Hub.
+2. Clone with Git LFS installed and run `git lfs pull` for the binary art and fonts.
+3. Open this folder through Unity Hub and wait for the initial import.
 4. Open `Assets/Scenes/MainMenu.unity` and enter Play mode.
-5. Choose **Play - Select Circuit**, then pick a track. All three circuits are available immediately.
 
-| Circuit | Description |
-| --- | --- |
-| Classic Circuit | Original spline circuit with long straights and sweeping turns |
-| Coastal Oval | Wide, flowing oval for learning the handling |
-| Canyon Run | Narrower circuit with changing-radius bends |
+Choose **Garage** to preview and select a car. Selection saves immediately and applies to all circuits and restarts. All cars and tracks are available from the start.
 
-The two new roads are generated when the scene starts, including curbs, matching collision boundaries, a white finish stripe, and four ordered timing gates. Their layouts are defined in `Assets/Car/CircuitTrack.cs`; they do not require baked mesh files. The original circuit retains its spline and collision layout.
+| Car | Speed | Acceleration | Steering | Drift factor |
+| --- | ---: | ---: | ---: | ---: |
+| Open-wheel racer | 14 | 11 | 2.8 | 0.90 |
+| Compact sports car | 12 | 14 | 3.2 | 0.92 |
+| Rally hatchback | 10 | 16 | 3.6 | 0.86 |
+
+The sports car is the default. Lower drift factors remove sideways velocity faster, giving stronger grip. Car definitions in `Assets/Resources/Cars/` also contain the three steering sprites, collider dimensions, and tire-emitter positions.
 
 ## Controls and timing
 
 - **WASD / arrow keys:** accelerate, reverse, and steer.
 - **R:** restart the current circuit.
-- **Escape:** return to the menu; also returns from Settings.
-- **Mouse or keyboard UI navigation:** select menu buttons and circuits.
+- **Escape:** return to the menu or leave the current menu screen.
+- **Mouse, keyboard, or gamepad UI controls:** browse menus and select options.
 
-Cross the finish line in the forward direction to start timing. Pass the checkpoints in order and cross the finish again to record a lap. The classic circuit requires its far-side checkpoint; the new tracks each require three intermediate checkpoints. Crossing the finish repeatedly or driving backwards cannot complete a lap. Each circuit saves its own fastest time, shown in the HUD and circuit picker. A collision ends the run and offers Restart and Main Menu.
+Cross the finish in the forward direction to start timing. Pass the ordered checkpoints before crossing again to record a lap. Collisions end the run. Each car has its own best time on each track, shown in the HUD and circuit picker. Previous track-only records remain saved and are not assigned to the new cars.
 
-Settings save volume and display preferences. Master volume controls the global listener, and fullscreen changes apply immediately. Music, SFX, and camera-shake preferences are stored for systems that use them; this project currently has no separate audio buses or shake effect.
+Classic Circuit preserves the original spline layout. Coastal Oval has a wider, flowing road; Canyon Run has narrower, changing-radius bends. Both new circuits generate their road meshes and collision boundaries on scene startup.
 
-## Repository contents
+## Art and UI
 
-Commit `Assets/` (including `.meta` files), `Packages/`, and `ProjectSettings/`, together with the root project documentation and Git configuration. Sprites, fonts, TextMesh Pro resources, render settings, and package lockfiles are required project inputs.
+The shared warm tan theme is `Assets/Resources/PastelTheme.asset`, anchored on **#D2B48C**. Scene-authored view prefabs, shared panels, buttons, vehicle, and race HUD live in `Assets/Prefabs/`. Edit these prefabs to adjust the game consistently; screens are not constructed or replaced at runtime.
 
-`.gitignore` excludes Unity caches, build output, logs, captures, local IDE files, and local Unity AI assistant settings. Generated files already committed must be removed from the index separately; ignore rules alone do not untrack them. Binary game assets use Git LFS via `.gitattributes`.
+Three transparent sprite sheets replace the original car model. Their imagegen prompt set is recorded in `Assets/Art/Cars/README.md`. Sprite subassets reference these PNGs; keep the source textures.
 
-## Validation
+`Assets/Resources/TireSmoke.asset` controls smoke size, lifetime, emission, slip threshold, and linger time for all models. Smoke uses a soft unlit material, world-space simulation, and sorting between the road and car. It fades after a crash and starts clear on restart.
 
-Run **Tools > Racing > Validate Game** in Unity, or run the editor from the command line:
+Settings save display and volume preferences. Master volume controls the listener and fullscreen applies immediately. Separate music, effects, and camera-shake preferences remain available for systems that consume them; no separate audio buses or shake effect are included.
+
+## Validation and Windows build
+
+Use Unity's **Tools > Racing > Validate Game** for editor checks across all nine car/track combinations, checkpoint ordering, spawn safety, smoke setup, crash state, garage selection, record isolation, and menu references. The checks restore existing selection and records. Save your scene edits before running: validation opens scenes in Single mode.
+
+Use **Tools > Racing > Build Windows Development Player** to build `Builds/SundayCircuit.exe`. Command-line equivalents:
 
 ```powershell
-& 'C:\Program Files\Unity\Hub\Editor\6000.5.7f1\Editor\Unity.exe' -batchmode -nographics -quit -projectPath . -executeMethod GameValidation.Run -logFile Logs/game-validation.log
+$unityEditor = 'C:\Program Files\Unity\Hub\Editor\6000.5.7f1\Editor\Unity.exe'
+& $unityEditor -batchmode -nographics -quit -projectPath . -executeMethod GameValidation.Run -logFile Logs/editor-validation.log
+& $unityEditor -batchmode -nographics -quit -projectPath . -executeMethod GameValidation.BuildWindows -logFile Logs/windows-build.log
 ```
 
-The validation opens all three scenes, checks build registration, road geometry, collision boundaries, HUD references, checkpoint ordering, best-time persistence, crash state, and menu navigation. It restores existing lap records. Run it with no unsaved scene edits: it opens scenes in Single mode. For a manual play check, select each track, drive a full lap, crash and restart, then return to the menu and confirm its record. Also check Settings and keyboard navigation at the target window size.
+The development player includes opt-in integration checks. Run it with `-racing-validation -racing-output <absolute-output-folder>` to exercise menu pointer and submit events, capture 1280x720 and 1920x1080 screens, cross physical checkpoints, collide with barriers, restart, and verify records. It restores selection and record preferences on completion. Normal launches never run these checks. Separate `-racing-persist-write` and `-racing-persist-read` runs verify selection across process restarts; use the same output directory for both, and always run the read step to restore the prior selection.
+
+**Tools > Racing > Rebuild Pastel Assets and Scenes** regenerates the authored setup from `RacingProjectSetup`. It replaces menu views and race HUDs, so use it only when intentionally rebuilding those assets. Routine play and validation do not call it.
+
+## Source control
+
+Commit `Assets/` with `.meta` files, `Packages/`, and `ProjectSettings/`. The ignore rules exclude Unity caches, builds, logs, recordings, local IDE files, and local Unity AI assistant settings. Binary art uses Git LFS through `.gitattributes`.

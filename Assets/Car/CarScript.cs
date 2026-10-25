@@ -1,124 +1,104 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D), typeof(SpriteRenderer), typeof(BoxCollider2D))]
 public class CarScript : MonoBehaviour
 {
     public Rigidbody2D myRigidbody;
     public Logic logic;
     public bool alive = true;
     public SpriteRenderer spriteRenderer;
-    public Sprite sprite1;
-    public Sprite sprite2;
-    public Sprite sprite3;
-    public float maxSpeed = 100f;
-    public float acceleration = 100f;
-    public float turnfactor = 3.5f;
-    public float driftfactor = 0.9f;
-    private float accelerationInput = 0f;
-    private float turnInput = 0f;
+    public CarDefinition definition;
+    public TireSmokeProfile smokeProfile;
     public ParticleSystem tireSmokeParticles1;
     public ParticleSystem tireSmokeParticles2;
-    public float driftSmokeThreshold = 1.5f;
-    public float oversteerFactor = 1.2f;
-    public float smokeLingerTime = 0.2f; 
-    private float smokeTimer = 0f;
+    public float maxSpeed;
+    public float acceleration;
+    public float turnfactor;
+    public float driftfactor;
+    public float oversteerFactor = 0.5f;
+    float accelerationInput;
+    float turnInput;
+    float smokeTimer;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         myRigidbody = GetComponent<Rigidbody2D>();
-    }
-    void Start()
-    {
-        gameObject.name = "George Russell";
-        logic = FindAnyObjectByType<Logic>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        
-        
+        logic = FindAnyObjectByType<Logic>();
+        ApplyDefinition(CarSelection.Current);
     }
-
-    // Update is called once per frame
+    public void ApplyDefinition(CarDefinition car)
+    {
+        definition = car;
+        myRigidbody.linearDamping = 0.5f;
+        gameObject.name = car.displayName;
+        transform.localScale = Vector3.one;
+        spriteRenderer.sprite = car.straight;
+        spriteRenderer.sortingOrder = 10;
+        maxSpeed = car.maxSpeed;
+        acceleration = car.acceleration;
+        turnfactor = car.steering;
+        driftfactor = car.driftFactor;
+        var collider = GetComponent<BoxCollider2D>();
+        collider.size = car.colliderSize;
+        collider.offset = car.colliderOffset;
+        SetupSmoke(tireSmokeParticles1, car.leftTire);
+        SetupSmoke(tireSmokeParticles2, car.rightTire);
+    }
+    void SetupSmoke(ParticleSystem particles, Vector2 position)
+    {
+        if (particles == null || smokeProfile == null) return;
+        particles.transform.localPosition = new Vector3(position.x, position.y, 0.5f);
+        particles.transform.localScale = Vector3.one;
+        particles.transform.localRotation = Quaternion.identity;
+        smokeProfile.Apply(particles);
+    }
     void Update()
     {
+        if (!alive) return;
         accelerationInput = Input.GetAxis("Vertical");
         turnInput = Input.GetAxis("Horizontal");
-        if (!alive) return;
-        if (turnInput < 0)
-        {
-            if (spriteRenderer != null) spriteRenderer.sprite = sprite1;
-        }
-        else
-        if (turnInput > 0)
-        {
-            if (spriteRenderer != null) spriteRenderer.sprite = sprite2;
-        }
-        else
-        {
-            if (spriteRenderer != null) spriteRenderer.sprite = sprite3;
-        }
+        spriteRenderer.sprite = turnInput < -0.05f ? definition.left : turnInput > 0.05f ? definition.right : definition.straight;
     }
-    private void FixedUpdate()
+    void FixedUpdate()
     {
         if (!alive) return;
-        ApplyEngineForce();
-        ApplyDrift();
-        ApplySteering();
-        HandleParticleEffects();
+        float forwardSpeed = Vector2.Dot(transform.up, myRigidbody.linearVelocity);
+        if (!((forwardSpeed > maxSpeed && accelerationInput > 0) || (forwardSpeed < -maxSpeed * 0.5f && accelerationInput < 0)))
+            myRigidbody.AddForce(transform.up * accelerationInput * acceleration);
+        Vector2 forward = transform.up * Vector2.Dot(myRigidbody.linearVelocity, transform.up);
+        Vector2 sideways = transform.right * Vector2.Dot(myRigidbody.linearVelocity, transform.right);
+        myRigidbody.linearVelocity = forward + sideways * driftfactor;
+        float turning = Mathf.Clamp01(myRigidbody.linearVelocity.magnitude / 8);
+        float direction = Vector2.Dot(myRigidbody.linearVelocity, transform.up) >= 0 ? 1 : -1;
+        float slip = Vector2.Dot(myRigidbody.linearVelocity, transform.right);
+        myRigidbody.MoveRotation(myRigidbody.rotation - (turnInput * turnfactor - slip * oversteerFactor) * turning * direction);
+        UpdateSmoke(Mathf.Abs(slip));
     }
-
-    private void ApplyEngineForce()
+    public void UpdateSmoke(float slip)
     {
-        float velocityVsUp = Vector2.Dot(transform.up, myRigidbody.linearVelocity);
-        if (velocityVsUp > maxSpeed && accelerationInput > 0) return;
-        if (velocityVsUp < -maxSpeed && accelerationInput < 0) return;
-        Vector2 engineForce = transform.up * accelerationInput * acceleration;
-        myRigidbody.AddForce(engineForce, ForceMode2D.Force);
+        if (smokeProfile == null) return;
+        smokeTimer = alive && slip > smokeProfile.slipThreshold ? smokeProfile.linger : Mathf.Max(0, smokeTimer - Time.fixedDeltaTime);
+        SetEmission(tireSmokeParticles1, alive && smokeTimer > 0);
+        SetEmission(tireSmokeParticles2, alive && smokeTimer > 0);
     }
-    private void ApplyDrift()
+    static void SetEmission(ParticleSystem particles, bool enabled)
     {
-        Vector2 forwardVelocity = transform.up * Vector2.Dot(myRigidbody.linearVelocity, transform.up);
-        Vector2 rightVelocity = transform.right * Vector2.Dot(myRigidbody.linearVelocity, transform.right);
-        myRigidbody.linearVelocity = forwardVelocity + rightVelocity * driftfactor;
+        if (particles == null) return;
+        var emission = particles.emission;
+        emission.enabled = enabled;
     }
-    private void ApplySteering()
+    public void StopCar()
     {
-        float minSpeedBeforeAllowTurningFactor = (myRigidbody.linearVelocity.magnitude / 8);
-        minSpeedBeforeAllowTurningFactor = Mathf.Clamp01(minSpeedBeforeAllowTurningFactor);
-        float directionMultiplier = Vector2.Dot(myRigidbody.linearVelocity, transform.up) >= 0 ? 1.0f : -1.0f;
-        float sidewaysVelocity = Vector2.Dot(myRigidbody.linearVelocity, transform.right);
-        float spinEffect = sidewaysVelocity * oversteerFactor;
-        float rotationangle = (turnInput * turnfactor - spinEffect) * minSpeedBeforeAllowTurningFactor;
-    
-    myRigidbody.MoveRotation(myRigidbody.rotation - rotationangle * directionMultiplier);
+        alive = false;
+        accelerationInput = turnInput = smokeTimer = 0;
+        myRigidbody.linearVelocity = Vector2.zero;
+        myRigidbody.angularVelocity = 0;
+        SetEmission(tireSmokeParticles1, false);
+        SetEmission(tireSmokeParticles2, false);
     }
-    private void OnCollisionEnter2D(Collision2D collision) {
-            logic.gameOver();
-            alive = false;
-    }
-    private void HandleParticleEffects()
+    void OnCollisionEnter2D(Collision2D collision)
     {
-        if (tireSmokeParticles1 != null && tireSmokeParticles2 != null)
-        {
-            float sidewaysSlip = Mathf.Abs(Vector2.Dot(myRigidbody.linearVelocity, transform.right));
-
-            
-            if (sidewaysSlip > driftSmokeThreshold)
-            {
-                smokeTimer = smokeLingerTime; 
-            }
-            else
-            {
-                
-                smokeTimer -= Time.fixedDeltaTime; 
-            }
-
-            
-            bool shouldEmit = smokeTimer > 0f;
-
-            var emission1 = tireSmokeParticles1.emission;
-            if (emission1.enabled != shouldEmit) emission1.enabled = shouldEmit;
-
-            var emission2 = tireSmokeParticles2.emission;
-            if (emission2.enabled != shouldEmit) emission2.enabled = shouldEmit;
-        }
+        if (alive && logic != null) logic.gameOver();
     }
 }

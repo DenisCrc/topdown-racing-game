@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: bc4444714bf08c84eb57e8b7d5bae21b
+guid: 238f18ba46b2859409befc47111e547a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5128473674994502319
-    second: Masina_Right_0
+      213: 2828077047651648745
+    second: Smoke_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,44 +100,44 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Masina_Right_0
+      name: Smoke_0
       rect:
         serializedVersion: 2
-        x: 215
-        y: 68
-        width: 315
-        height: 603
+        x: 0
+        y: 0
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
+      customData:
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 155b20a4d5004d8b0800000000000000
-      internalID: -5128473674994502319
+      spriteID: 9e446be47195f3720800000000000000
+      internalID: 2828077047651648745
       vertices: []
-      indices: 
+      indices:
       edges: []
       weights: []
     outline: []
-    customData: 
+    customData:
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID:
     internalID: 0
     vertices: []
-    indices: 
+    indices:
     edges: []
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Masina_Right_0: -5128473674994502319
-  mipmapLimitGroupName: 
+      Smoke_0: 2828077047651648745
+  mipmapLimitGroupName:
   pSDRemoveMatte: 0
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+  userData:
+  assetBundleName:
+  assetBundleVariant:

@@ -20,6 +20,7 @@ public class CircuitTrack : MonoBehaviour
 
     void Awake()
     {
+        var theme = PastelTheme.Current;
         float width = layout == 0 ? 6 : 4.5f;
         var vertices = new Vector3[Samples * 4];
         var colors = new Color[vertices.Length];
@@ -37,8 +38,11 @@ public class CircuitTrack : MonoBehaviour
             {
                 vertices[i * 4 + lane] = p + normal * offsets[lane];
                 colors[i * 4 + lane] = lane == 0 || lane == 3
-                    ? (i / 4 % 2 == 0 ? Color.white : new Color(0.9f, 0.25f, 0.15f))
-                    : (i == 0 ? Color.white : new Color(0.22f, 0.25f, 0.29f));
+                    ? (i / 4 % 2 == 0 ? theme.panel : theme.coral)
+                    : (i == 0 ? theme.panel : theme.road);
+                // Mesh vertex colors are linear; UI and material Color properties are converted by Unity.
+                if (QualitySettings.activeColorSpace == ColorSpace.Linear)
+                    colors[i * 4 + lane] = colors[i * 4 + lane].linear;
             }
             outer[i] = p - normal * width / 2;
             inner[i] = p + normal * width / 2;
@@ -56,7 +60,7 @@ public class CircuitTrack : MonoBehaviour
         roadMesh = new Mesh { name = "Circuit Road", vertices = vertices, triangles = triangles, colors = colors };
         roadMesh.RecalculateBounds();
         gameObject.AddComponent<MeshFilter>().sharedMesh = roadMesh;
-        roadMaterial = new Material(Shader.Find("Sprites/Default"));
+        roadMaterial = new Material(Resources.Load<Material>("CarMaterial"));
         gameObject.AddComponent<MeshRenderer>().sharedMaterial = roadMaterial;
 
         var logic = FindAnyObjectByType<Logic>();
@@ -80,7 +84,7 @@ public class CircuitTrack : MonoBehaviour
         Vector2 forward = Point(layout, -0.14f) - Point(layout, -0.16f);
         car.transform.up = forward;
         var camera = Camera.main;
-        camera.backgroundColor = layout == 0 ? new Color(0.08f, 0.28f, 0.25f) : new Color(0.32f, 0.19f, 0.12f);
+        camera.backgroundColor = theme.background;
         camera.transform.position = car.transform.position + new Vector3(0, 0, -8);
         camera.transform.rotation = car.transform.rotation;
         camera.orthographicSize = 9;

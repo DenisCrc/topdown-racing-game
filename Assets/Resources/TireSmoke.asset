@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6765a1a5147857f4cbd890a74f94ca5a, type: 3}
+  m_Name: TireSmoke
+  m_EditorClassIdentifier: Assembly-CSharp::TireSmokeProfile
+  material: {fileID: 2100000, guid: aad10a16d093a1e4d9a94e7cbb8c5e3a, type: 2}
+  minSize: 0.35
+  maxSize: 0.7
+  minLifetime: 0.6
+  maxLifetime: 1.1
+  emission: 38
+  slipThreshold: 0.65
+  linger: 0.35
