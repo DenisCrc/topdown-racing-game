@@ -133,6 +133,9 @@ public class RacingPlayerValidation : MonoBehaviour
             Click(NamedButton("Choose a circuit")); yield return new WaitForSeconds(.1f);
             Check(FindAnyObjectByType<Menu>().levels.activeSelf, "Circuit picker did not open");
             Screenshot("circuits-" + suffix); yield return new WaitForSeconds(.15f);
+            Click(NamedButton("Next >")); yield return new WaitForSeconds(.1f);
+            Check(FindObjectsByType<LevelCard>().Length == 2, "New circuits are missing from page two");
+            Screenshot("circuits-page-two-" + suffix); yield return new WaitForSeconds(.15f);
             Submit(NamedButton("Back")); yield return null;
             Click(NamedButton("Garage")); yield return new WaitForSeconds(.25f);
             var garage = FindAnyObjectByType<Garage>();
@@ -220,7 +223,8 @@ public class RacingPlayerValidation : MonoBehaviour
                 Check(FindAnyObjectByType<CarScript>().definition == model && FindAnyObjectByType<Logic>().alive, "Restart lost model or run state");
                 Check(FindAnyObjectByType<CarScript>().tireSmokeParticles1.particleCount == 0, "Restart retained particles");
                 FindAnyObjectByType<Logic>().MainMenu(); yield return new WaitForSeconds(.25f);
-                FindAnyObjectByType<Menu>().Play(); yield return null;
+                FindAnyObjectByType<Menu>().Play();
+                FindAnyObjectByType<Menu>().ShowCircuitPageFor(Array.IndexOf(LevelCatalog.Scenes, level)); yield return null;
                 var card = FindObjectsByType<LevelCard>().Single(c => LevelCatalog.Scenes[c.index] == level);
                 Check(card.record.text.Contains(lap.ToString("0.00")), "Record not shown in menu");
                 Debug.Log("PLAYER VALIDATED: " + level + " / " + model.id);

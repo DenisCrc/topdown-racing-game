@@ -6,22 +6,31 @@ using UnityEngine;
 public class CircuitTrack : MonoBehaviour
 {
     public int layout;
-    const int Samples = 192;
+    int Samples => layout >= 3 ? 384 : 192;
+    public int GateCount => layout >= 3 ? 8 : 4;
     Mesh roadMesh;
     Material roadMaterial;
 
     public static Vector2 Point(int layout, float angle)
     {
-        if (layout == 0)
-            return new Vector2(24 * Mathf.Cos(angle), 16 * Mathf.Sin(angle));
-        float radius = 23 + 5 * Mathf.Cos(3 * angle);
-        return new Vector2(radius * Mathf.Cos(angle), 0.85f * radius * Mathf.Sin(angle));
+        switch (layout)
+        {
+            case 0: return new Vector2(24 * Mathf.Cos(angle), 16 * Mathf.Sin(angle));
+            case 1:
+                float canyonRadius = 23 + 5 * Mathf.Cos(3 * angle);
+                return new Vector2(canyonRadius * Mathf.Cos(angle), 0.85f * canyonRadius * Mathf.Sin(angle));
+            case 2: return new Vector2(28 * Mathf.Cos(angle) + 4 * Mathf.Sin(2 * angle), 20 * Mathf.Sin(angle));
+            case 3: return new Vector2((44 + 8 * Mathf.Cos(2 * angle)) * Mathf.Cos(angle), 30 * Mathf.Sin(angle));
+            default:
+                float enduranceRadius = 42 + 7 * Mathf.Cos(3 * angle);
+                return new Vector2(1.15f * enduranceRadius * Mathf.Cos(angle), 0.95f * enduranceRadius * Mathf.Sin(angle));
+        }
     }
 
     void Awake()
     {
         var theme = PastelTheme.Current;
-        float width = layout == 0 ? 6 : 4.5f;
+        float width = layout >= 3 ? 6.5f : layout == 0 ? 6 : layout == 2 ? 5.5f : 4.5f;
         var vertices = new Vector3[Samples * 4];
         var colors = new Color[vertices.Length];
         var triangles = new int[Samples * 18];
@@ -64,10 +73,10 @@ public class CircuitTrack : MonoBehaviour
         gameObject.AddComponent<MeshRenderer>().sharedMaterial = roadMaterial;
 
         var logic = FindAnyObjectByType<Logic>();
-        logic.checkpointCount = 4;
-        for (int i = 0; i < 4; i++)
+        logic.checkpointCount = GateCount;
+        for (int i = 0; i < GateCount; i++)
         {
-            float angle = i * Mathf.PI / 2;
+            float angle = i * Mathf.PI * 2 / GateCount;
             Vector2 direction = (Point(layout, angle + 0.01f) - Point(layout, angle - 0.01f)).normalized;
             var gate = new GameObject(i == 0 ? "Finish" : "Checkpoint " + i);
             gate.transform.SetParent(transform, false);

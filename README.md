@@ -1,6 +1,6 @@
 # Sunday Circuit
 
-A pastel, top-down Unity time-trial racer with three cars, three circuits, drift smoke, and per-car lap records.
+A pastel, top-down Unity time-trial racer with three cars, five circuits, drift smoke, and per-car lap records.
 
 ## Open and play
 
@@ -13,7 +13,7 @@ Choose **Garage** to preview and select a car. Selection saves immediately and a
 
 | Car | Speed | Acceleration | Steering | Drift factor |
 | --- | ---: | ---: | ---: | ---: |
-| Open-wheel racer | 14 | 11 | 2.8 | 0.90 |
+| Open-wheel racer | 14 | 11 | 2.8 | 0.78 |
 | Compact sports car | 12 | 14 | 3.2 | 0.92 |
 | Rally hatchback | 10 | 16 | 3.6 | 0.86 |
 
@@ -28,7 +28,9 @@ The sports car is the default. Lower drift factors remove sideways velocity fast
 
 Cross the finish in the forward direction to start timing. Pass the ordered checkpoints before crossing again to record a lap. Collisions end the run. Each car has its own best time on each track, shown in the HUD and circuit picker. Previous track-only records remain saved and are not assigned to the new cars.
 
-Classic Circuit preserves the original spline layout. Coastal Oval has a wider, flowing road; Canyon Run has narrower, changing-radius bends. Both new circuits generate their road meshes and collision boundaries on scene startup.
+All five circuits use the same flat road surface, pastel curbs, finish stripe, and collision-boundary system. Classic Circuit has been rebuilt as a flowing course that matches the others. Coastal Oval is wide and gentle; Canyon Run is narrower and more technical. Highland Grand Prix and Sunset Endurance are substantially larger, with longer straights, sweeping bends, wider roads, and eight timing gates. Browse the circuit picker's second page to race them.
+
+The race HUD is a compact top strip, with no driving-control overlay during play. Controls remain available on the menus and in this README. The F1-style racer has stronger lateral grip and reduced oversteer; the other two cars retain their handling. Rebuilt Classic Circuit uses a fresh record key so old lap times remain saved without being compared against the new route.
 
 ## Art and UI
 
@@ -42,7 +44,7 @@ Settings save display and volume preferences. Master volume controls the listene
 
 ## Validation and Windows build
 
-Use Unity's **Tools > Racing > Validate Game** for editor checks across all nine car/track combinations, checkpoint ordering, spawn safety, smoke setup, crash state, garage selection, record isolation, and menu references. The checks restore existing selection and records. Save your scene edits before running: validation opens scenes in Single mode.
+Use Unity's **Tools > Racing > Validate Game** for editor checks across all 15 car/track combinations, checkpoint ordering, spawn safety, smoke setup, crash state, garage selection, record isolation, and menu references. The checks restore existing selection and records. Save your scene edits before running: validation opens scenes in Single mode.
 
 Use **Tools > Racing > Build Windows Development Player** to build `Builds/SundayCircuit.exe`. Command-line equivalents:
 
@@ -54,7 +56,7 @@ $unityEditor = 'C:\Program Files\Unity\Hub\Editor\6000.5.7f1\Editor\Unity.exe'
 
 The development player includes opt-in integration checks. Run it with `-racing-validation -racing-output <absolute-output-folder>` to exercise menu pointer and submit events, capture 1280x720 and 1920x1080 screens, cross physical checkpoints, collide with barriers, restart, and verify records. It restores selection and record preferences on completion. Normal launches never run these checks. Separate `-racing-persist-write` and `-racing-persist-read` runs verify selection across process restarts; use the same output directory for both, and always run the read step to restore the prior selection.
 
-**Tools > Racing > Rebuild Pastel Assets and Scenes** regenerates the authored setup from `RacingProjectSetup`. It replaces menu views and race HUDs, so use it only when intentionally rebuilding those assets. Routine play and validation do not call it.
+**Tools > Racing > Rebuild Pastel Assets and Scenes** regenerates the authored setup from `RacingProjectSetup`. It replaces menu views and race HUDs and recreates Classic Circuit and the two large circuits from the common template, so use it only when intentionally rebuilding those assets. Routine play and validation do not call it.
 
 ## Source control
 

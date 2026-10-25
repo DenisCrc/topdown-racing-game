@@ -42,8 +42,9 @@ public static class RacingProjectSetup
         BuildMainMenu();
         BuildGarage();
         BuildSettings();
+        EnsureNewCircuits();
         foreach (string level in LevelCatalog.Scenes) UpdateRace(level, carMaterial);
-        EditorBuildSettings.scenes = new[] { "MainMenu", "Garage", "Settings", "Level1", "Level2", "Level3" }
+        EditorBuildSettings.scenes = new[] { "MainMenu", "Garage", "Settings" }.Concat(LevelCatalog.Scenes)
             .Select(s => new EditorBuildSettingsScene("Assets/Scenes/" + s + ".unity", true)).ToArray();
         foreach (string name in new[] { "Masina", "Masina_Left", "Masina_Right" })
             AssetDatabase.DeleteAsset("Assets/Car/" + name + ".png");
@@ -56,10 +57,10 @@ public static class RacingProjectSetup
     {
         string[] ids = { "racer", "sports", "rally" };
         string[] names = { "Open-wheel racer", "Compact sports car", "Rally hatchback" };
-        string[] descriptions = { "Light on its feet. Built for long straights and precise lines.",
+        string[] descriptions = { "Planted at speed. Strong grip for fast, precise lines.",
             "A playful all-rounder. Quick acceleration with a little extra slide.",
             "Short, nimble and sure-footed. Strong grip for the tightest bends." };
-        float[] speed = { 14, 12, 10 }, acceleration = { 11, 14, 16 }, steering = { 2.8f, 3.2f, 3.6f }, drift = { .90f, .92f, .86f };
+        float[] speed = { 14, 12, 10 }, acceleration = { 11, 14, 16 }, steering = { 2.8f, 3.2f, 3.6f }, drift = { .78f, .92f, .86f };
         for (int i = 0; i < ids.Length; i++)
         {
             string path = "Assets/Art/Cars/" + ids[i] + ".png";
@@ -80,7 +81,7 @@ public static class RacingProjectSetup
                 AssetDatabase.CreateAsset(car, assetPath);
             }
             car.id = ids[i]; car.displayName = names[i]; car.description = descriptions[i]; car.order = i;
-            car.maxSpeed = speed[i]; car.acceleration = acceleration[i]; car.steering = steering[i]; car.driftFactor = drift[i];
+            car.maxSpeed = speed[i]; car.acceleration = acceleration[i]; car.steering = steering[i]; car.driftFactor = drift[i]; car.oversteerFactor = i == 0 ? .2f : .5f;
             car.colliderSize = new Vector2(i == 0 ? .9f : .72f, 1.35f);
             car.leftTire = new Vector2(i == 0 ? -.39f : -.32f, -.5f);
             car.rightTire = new Vector2(-car.leftTire.x, car.leftTire.y);
@@ -258,7 +259,7 @@ public static class RacingProjectSetup
         Header(home, "Sunday Circuit", "A small car. An open road. One more lap.");
         var card = Panel(home, "Welcome", 0, -38, 1100, 420);
         Label(card, "A little drift.\nA better lap.", -235, 65, 540, 160, 49).fontStyle = FontStyle.Bold;
-        Label(card, "Three cars. Three circuits. Find your rhythm.", -235, -45, 540, 45, 21);
+        Label(card, "Three cars. Five circuits. Find your rhythm.", -235, -45, 540, 45, 21);
         menu.selectedCar = Label(card, "YOUR CAR", -235, -105, 540, 45, 17);
         int i = 0;
         foreach (var car in CarSelection.All) Preview(card, car.straight, -445 + i++ * 115, -165, 85, 85);
@@ -268,18 +269,33 @@ public static class RacingProjectSetup
         Button(card, "Quit", 325, -120, menu.Quit);
         var levels = Rect("Circuit Selection", stage, new Vector2(1160, 660), Vector2.zero); menu.levels = levels.gameObject;
         Header(levels, "Choose your circuit", "The road is yours. Race against your own best time.");
-        for (i = 0; i < 3; i++)
+        int pageCount = (LevelCatalog.Scenes.Length + 2) / 3;
+        menu.circuitPages = new GameObject[pageCount];
+        menu.pageFirst = new Button[pageCount];
+        for (int page = 0; page < pageCount; page++)
         {
-            var p = Panel(levels, LevelCatalog.Names[i], -370 + i * 370, -35, 350, 390);
-            var item = p.gameObject.AddComponent<LevelCard>(); item.index = i;
-            item.title = Label(p, (i + 1).ToString("00") + "  " + LevelCatalog.Names[i], 0, 152, 305, 38, 23);
-            item.description = Label(p, LevelCatalog.Descriptions[i], 0, 98, 305, 58, 17);
-            item.preview = Preview(p, CarSelection.Current.straight, 0, -2, 120, 138);
-            item.record = Label(p, "SET YOUR FIRST LAP", 0, -102, 305, 50, 15, TextAnchor.MiddleCenter);
-            var button = Button(p, "Race", 0, -158, item.Race, 300);
-            if (i == 0) menu.levelsFirst = button;
+            var pageRoot = Rect("Circuits Page " + (page + 1), levels, new Vector2(1160, 660), Vector2.zero);
+            menu.circuitPages[page] = pageRoot.gameObject;
+            for (int column = 0; column < 3; column++)
+            {
+                i = page * 3 + column;
+                if (i >= LevelCatalog.Scenes.Length) break;
+                var p = Panel(pageRoot, LevelCatalog.Names[i], -370 + column * 370, -35, 350, 390);
+                var item = p.gameObject.AddComponent<LevelCard>(); item.index = i;
+                item.title = Label(p, (i + 1).ToString("00") + "  " + LevelCatalog.Names[i], 0, 152, 305, 42, 21);
+                item.description = Label(p, LevelCatalog.Descriptions[i], 0, 98, 305, 58, 17);
+                item.preview = Preview(p, CarSelection.Current.straight, 0, -2, 120, 138);
+                item.record = Label(p, "SET YOUR FIRST LAP", 0, -102, 305, 50, 15, TextAnchor.MiddleCenter);
+                var button = Button(p, "Race", 0, -158, item.Race, 300);
+                if (column == 0) menu.pageFirst[page] = button;
+                if (i == 0) menu.levelsFirst = button;
+            }
+            pageRoot.gameObject.SetActive(page == 0);
         }
         Button(levels, "Back", -405, -275, menu.ShowMainMenu, 290);
+        Button(levels, "< Previous", -50, -275, menu.PreviousCircuitPage, 240);
+        menu.pageLabel = Label(levels, "1 / " + pageCount, 155, -275, 140, 40, 20, TextAnchor.MiddleCenter);
+        Button(levels, "Next >", 405, -275, menu.NextCircuitPage, 290);
         levels.gameObject.SetActive(false);
         SaveScreen("MainMenu");
     }
@@ -336,6 +352,19 @@ public static class RacingProjectSetup
         SaveScreen("Settings");
     }
 
+    static void EnsureNewCircuits()
+    {
+        // Use the common circuit scene as a template, preserving each target scene's GUID.
+        foreach (var entry in new[] { (name: "Level1", layout: 2), (name: "Level4", layout: 3), (name: "Level5", layout: 4) })
+        {
+            EditorSceneManager.OpenScene("Assets/Scenes/Level2.unity");
+            var circuit = UnityEngine.Object.FindAnyObjectByType<CircuitTrack>();
+            circuit.layout = entry.layout;
+            EditorUtility.SetDirty(circuit);
+            EditorSceneManager.SaveScene(SceneManager.GetActiveScene(), "Assets/Scenes/" + entry.name + ".unity");
+        }
+    }
+
     static void UpdateRace(string scene, Material carMaterial)
     {
         EditorSceneManager.OpenScene("Assets/Scenes/" + scene + ".unity");
@@ -377,14 +406,12 @@ public static class RacingProjectSetup
         var scaler = root.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1280, 720); scaler.matchWidthOrHeight = .5f;
         var hud = root.AddComponent<RaceHud>();
-        var bar = Panel(root.transform, "Timing Card", 0, 275, 1100, 120);
-        hud.circuit = Label(bar, "Circuit", -320, 27, 400, 38, 27);
-        hud.carName = Label(bar, "Car", -320, -25, 400, 30, 18);
-        var time = Label(bar, "0.00 s", 110, 8, 300, 70, 44, TextAnchor.MiddleCenter);
-        var best = Label(bar, "BEST --", 405, 12, 230, 45, 23, TextAnchor.MiddleCenter);
-        var status = Label(root.transform, "Cross the finish stripe to start", 0, -275, 900, 36, 21, TextAnchor.MiddleCenter);
-        var footer = Panel(root.transform, "Controls Card", 0, -323, 1100, 35);
-        Label(footer, "WASD / ARROWS  Drive      R  Restart      ESC  Main menu", 0, 0, 1050, 32, 16, TextAnchor.MiddleCenter);
+        var bar = Panel(root.transform, "Timing Card", 0, 315, 920, 64);
+        hud.circuit = Label(bar, "Circuit", -265, 13, 340, 27, 19);
+        hud.carName = Label(bar, "Car", -265, -13, 340, 23, 14);
+        var time = Label(bar, "0.00 s", 100, 0, 240, 50, 30, TextAnchor.MiddleCenter);
+        var best = Label(bar, "BEST --", 345, 0, 190, 40, 18, TextAnchor.MiddleCenter);
+        var status = Label(root.transform, "Cross the finish stripe to start", 0, -325, 900, 28, 18, TextAnchor.MiddleCenter);
         var over = Rect("Game Over", root.transform, Vector2.zero, Vector2.zero); Stretch(over);
         over.gameObject.AddComponent<Image>().color = new Color(theme.background.r, theme.background.g, theme.background.b, .84f);
         var card = Panel(over, "Run Finished Card", 0, 0, 660, 355);

@@ -47,13 +47,15 @@ public static class GameValidation
                     Check(logic && car, "Missing race components: " + scene);
                     Check(logic.scoreText && logic.highScoreText && logic.statusText && logic.gameOverPanel, "Missing HUD");
                     var circuit = UnityEngine.Object.FindAnyObjectByType<CircuitTrack>();
-                    if (circuit != null) Initialize(circuit, "Awake");
-                    else Initialize(UnityEngine.Object.FindAnyObjectByType<ClassicCircuit>(), "Awake");
+                    Check(circuit != null, "Every circuit must use the common track renderer");
+                    Initialize(circuit, "Awake");
                     Initialize(car, "Awake"); Initialize(logic, "Start");
                     Check(car.definition == definition && car.maxSpeed == definition.maxSpeed && car.acceleration == definition.acceleration
                         && car.driftfactor == definition.driftFactor && car.turnfactor == definition.steering, "Incorrect car applied");
                     Check(car.spriteRenderer.sprite == definition.straight && car.spriteRenderer.sortingOrder == 10, "Incorrect sprite");
                     Check(car.GetComponent<BoxCollider2D>().size == definition.colliderSize, "Incorrect hitbox");
+                    Check(logic.scoreText.transform.parent.GetComponent<RectTransform>().sizeDelta.y <= 64, "HUD is too tall");
+                    Check(!logic.scoreText.canvas.GetComponentsInChildren<Text>(true).Any(t => t.text.Contains("WASD")), "Race controls should be hidden");
                     Physics2D.SyncTransforms();
                     Check(!Physics2D.OverlapBox(car.transform.position, definition.colliderSize * .95f, car.transform.eulerAngles.z,
                         1 << 0, 0, 10), "Car spawn overlaps track boundary: " + scene);
@@ -104,13 +106,17 @@ public static class GameValidation
             menu.Play(); Check(!menu.home.activeSelf && menu.levels.activeSelf, "Picker navigation");
             foreach (var card in UnityEngine.Object.FindObjectsByType<LevelCard>())
             { card.Refresh(); Check(card.preview.sprite == CarSelection.Current.straight, "Picker preview differs from selection"); }
+            menu.NextCircuitPage();
+            Check(UnityEngine.Object.FindObjectsByType<LevelCard>().Length == 2, "Second page should show both new circuits");
+            menu.PreviousCircuitPage();
+            Check(UnityEngine.Object.FindObjectsByType<LevelCard>().Length == 3, "First page should show three circuits");
             menu.ShowMainMenu(); Check(menu.home.activeSelf && !menu.levels.activeSelf, "Back navigation");
             Check(CarSelection.Current.id == chosen, "Selection lost across scenes");
             EditorSceneManager.OpenScene("Assets/Scenes/Settings.unity"); CheckScripts();
             var settings = UnityEngine.Object.FindAnyObjectByType<Settings>();
             Check(settings.MasterVolumeSlider && settings.MusicVolumeSlider && settings.SFXVolumeSlider && settings.FullscreenToggle && settings.CameraShakeToggle, "Settings references");
-            Check(EditorBuildSettings.scenes.Count(s => s.enabled) == 6, "Expected six enabled scenes");
-            Debug.Log("GAME VALIDATION PASSED: nine car/track combinations, garage, records and menus");
+            Check(EditorBuildSettings.scenes.Count(s => s.enabled) == 8, "Expected eight enabled scenes");
+            Debug.Log("GAME VALIDATION PASSED: 15 car/track combinations, garage, records and menus");
         }
         finally
         {

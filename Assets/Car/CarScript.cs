@@ -39,6 +39,7 @@ public class CarScript : MonoBehaviour
         acceleration = car.acceleration;
         turnfactor = car.steering;
         driftfactor = car.driftFactor;
+        oversteerFactor = car.oversteerFactor;
         var collider = GetComponent<BoxCollider2D>();
         collider.size = car.colliderSize;
         collider.offset = car.colliderOffset;

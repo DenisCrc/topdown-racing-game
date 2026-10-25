@@ -10,6 +10,10 @@ public class Menu : MonoBehaviour
     public Button homeFirst;
     public Button levelsFirst;
     public Text selectedCar;
+    public GameObject[] circuitPages;
+    public Button[] pageFirst;
+    public Text pageLabel;
+    int page;
     void Start()
     {
         AudioListener.volume = PlayerPrefs.GetFloat("MasterVolume", 0.5f);
@@ -30,7 +34,17 @@ public class Menu : MonoBehaviour
     {
         home.SetActive(false);
         levels.SetActive(true);
-        Focus(levelsFirst);
+        ShowCircuitPageFor(0);
+    }
+    public void ShowCircuitPageFor(int circuitIndex) { SetPage(circuitIndex / 3); }
+    public void NextCircuitPage() { SetPage((page + 1) % circuitPages.Length); }
+    public void PreviousCircuitPage() { SetPage((page + circuitPages.Length - 1) % circuitPages.Length); }
+    void SetPage(int value)
+    {
+        page = Mathf.Clamp(value, 0, circuitPages.Length - 1);
+        for (int i = 0; i < circuitPages.Length; i++) circuitPages[i].SetActive(i == page);
+        pageLabel.text = (page + 1) + " / " + circuitPages.Length;
+        Focus(pageFirst[page]);
     }
     public static void Focus(Selectable target)
     {

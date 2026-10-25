@@ -243,6 +243,7 @@ MonoBehaviour:
   acceleration: 16
   steering: 3.6
   driftFactor: 0.86
+  oversteerFactor: 0.5
   colliderSize: {x: 0.72, y: 1.35}
   colliderOffset: {x: 0, y: 0}
   leftTire: {x: -0.32, y: -0.5}

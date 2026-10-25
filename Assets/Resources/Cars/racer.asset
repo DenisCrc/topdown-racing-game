@@ -454,7 +454,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CarDefinition
   id: racer
   displayName: Open-wheel racer
-  description: Light on its feet. Built for long straights and precise lines.
+  description: Planted at speed. Strong grip for fast, precise lines.
   order: 0
   straight: {fileID: 9160838742397260002}
   left: {fileID: -6353487952650809996}
@@ -462,7 +462,8 @@ MonoBehaviour:
   maxSpeed: 14
   acceleration: 11
   steering: 2.8
-  driftFactor: 0.9
+  driftFactor: 0.78
+  oversteerFactor: 0.2
   colliderSize: {x: 0.9, y: 1.35}
   colliderOffset: {x: 0, y: 0}
   leftTire: {x: -0.39, y: -0.5}
