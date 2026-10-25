@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // Builds each new circuit from a sampled centre line, with matching visible curbs,
 // solid boundaries and ordered timing gates. No generated mesh asset is required.
@@ -6,29 +7,55 @@ using UnityEngine;
 public class CircuitTrack : MonoBehaviour
 {
     public int layout;
-    int Samples => layout >= 3 ? 384 : 192;
-    public int GateCount => layout >= 3 ? 8 : 4;
+    int Samples => layout >= 3 ? 768 : 384;
+    public int GateCount => layout >= 3 ? 12 : 8;
     Mesh roadMesh;
     Material roadMaterial;
 
-    public static Vector2 Point(int layout, float angle)
-    {
-        switch (layout)
-        {
-            case 0: return new Vector2(24 * Mathf.Cos(angle), 16 * Mathf.Sin(angle));
-            case 1:
-                float canyonRadius = 23 + 5 * Mathf.Cos(3 * angle);
-                return new Vector2(canyonRadius * Mathf.Cos(angle), 0.85f * canyonRadius * Mathf.Sin(angle));
-            case 2: return new Vector2(28 * Mathf.Cos(angle) + 4 * Mathf.Sin(2 * angle), 20 * Mathf.Sin(angle));
-            case 3: return new Vector2((44 + 8 * Mathf.Cos(2 * angle)) * Mathf.Cos(angle), 30 * Mathf.Sin(angle));
-            default:
-                float enduranceRadius = 42 + 7 * Mathf.Cos(3 * angle);
-                return new Vector2(1.15f * enduranceRadius * Mathf.Cos(angle), 0.95f * enduranceRadius * Mathf.Sin(angle));
-        }
-    }
+    // Original Grand Prix-style routes: asymmetric outlines, long straights,
+    // slow chicanes and linked fast bends. Each corner has its own rounding.
+    static readonly CircuitPath[] Paths = {
+        new CircuitPath(new[] {
+            new Vector2(48,-36), new Vector2(48,28), new Vector2(36,44), new Vector2(10,48),
+            new Vector2(-8,34), new Vector2(-26,36), new Vector2(-44,20), new Vector2(-38,0),
+            new Vector2(-18,-4), new Vector2(-14,-20), new Vector2(-32,-28), new Vector2(-30,-44),
+            new Vector2(-8,-48), new Vector2(12,-32), new Vector2(32,-44)
+        }, 8, new[] { 9f, 12f, 14f, 10f, 8f, 10f, 10f, 9f, 6f, 5.5f, 5.5f, 8f, 9f, 6f, 6f }),
+        new CircuitPath(new[] {
+            new Vector2(40,-42), new Vector2(40,32), new Vector2(24,48), new Vector2(6,44),
+            new Vector2(-6,26), new Vector2(-28,32), new Vector2(-42,16), new Vector2(-38,-4),
+            new Vector2(-20,-12), new Vector2(-30,-28), new Vector2(-16,-42), new Vector2(0,-32),
+            new Vector2(14,-48), new Vector2(28,-54)
+        }, 8, new[] { 7f, 10f, 8f, 7f, 5f, 7f, 8f, 7f, 6.5f, 5f, 5f, 5f, 7f, 7f }),
+        new CircuitPath(new[] {
+            new Vector2(44,-48), new Vector2(44,34), new Vector2(28,34), new Vector2(28,52),
+            new Vector2(10,60), new Vector2(-12,58), new Vector2(-32,42), new Vector2(-44,20),
+            new Vector2(-44,-2), new Vector2(-28,-6), new Vector2(-28,-24), new Vector2(-42,-28),
+            new Vector2(-36,-48), new Vector2(-12,-58), new Vector2(16,-60), new Vector2(36,-56)
+        }, 8, new[] { 10f, 5.5f, 5.5f, 10f, 12f, 15f, 15f, 12f, 9f, 6f, 6f, 7f, 12f, 15f, 12f, 8f }),
+        new CircuitPath(new[] {
+            new Vector2(68,-50), new Vector2(68,42), new Vector2(48,62), new Vector2(18,54),
+            new Vector2(-4,66), new Vector2(-32,54), new Vector2(-48,26), new Vector2(-80,6),
+            new Vector2(-66,-24), new Vector2(-42,-28), new Vector2(-28,-8), new Vector2(-8,-12),
+            new Vector2(10,-42), new Vector2(32,-50), new Vector2(40,-30), new Vector2(22,-14),
+            new Vector2(26,4), new Vector2(44,10), new Vector2(50,-12), new Vector2(48,-50)
+        }, 8, new[] { 8f, 12f, 14f, 11f, 14f, 14f, 15f, 14f, 12f, 10f, 8f, 8f, 10f, 7f, 7f, 7f, 8f, 8f, 10f, 8f }),
+        new CircuitPath(new[] {
+            new Vector2(88,-52), new Vector2(88,50), new Vector2(60,62), new Vector2(42,44),
+            new Vector2(48,22), new Vector2(22,12), new Vector2(4,28), new Vector2(-18,24),
+            new Vector2(-36,44), new Vector2(-70,42), new Vector2(-88,14), new Vector2(-70,-10),
+            new Vector2(-40,-8), new Vector2(-34,-30), new Vector2(-64,-46), new Vector2(-56,-66),
+            new Vector2(-16,-60), new Vector2(8,-34), new Vector2(30,-40), new Vector2(42,-18),
+            new Vector2(60,-20), new Vector2(64,-44)
+        }, 8, new[] { 10f, 12f, 10f, 9f, 8f, 6.5f, 8f, 7f, 10f, 12f, 12f, 10f, 8f, 7f, 7f, 9f, 12f, 8f, 7f, 7f, 7f, 8f }),
+    };
+
+    public static Vector2 Point(int layout, float angle) => Paths[Mathf.Clamp(layout, 0, Paths.Length - 1)].Sample(angle);
 
     void Awake()
     {
+        int index = System.Array.IndexOf(LevelCatalog.Scenes, SceneManager.GetActiveScene().name);
+        if (index >= 0) layout = LevelCatalog.Layouts[index];
         var theme = PastelTheme.Current;
         float width = layout >= 3 ? 6.5f : layout == 0 ? 6 : layout == 2 ? 5.5f : 4.5f;
         var vertices = new Vector3[Samples * 4];

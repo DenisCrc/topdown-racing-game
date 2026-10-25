@@ -1,63 +1,33 @@
 # Sunday Circuit
 
-A pastel, top-down Unity time-trial racer with three cars, five circuits, drift smoke, and per-car lap records.
+A pastel Unity time-trial racer with three cars, five original F1-inspired circuits, drift smoke, a live minimap, and per-car lap records.
 
-## Open and play
+## Play
 
-1. Install **Unity 6000.5.7f1** using Unity Hub.
-2. Clone with Git LFS installed and run `git lfs pull` for the binary art and fonts.
-3. Open this folder through Unity Hub and wait for the initial import.
-4. Open `Assets/Scenes/MainMenu.unity` and enter Play mode.
+1. Install **Unity 6000.5.7f1** through Unity Hub.
+2. Clone the repository with Git LFS installed, then run `git lfs pull`.
+3. Open the project, load `Assets/Scenes/MainMenu.unity`, and enter Play mode.
 
-Choose **Garage** to preview and select a car. Selection saves immediately and applies to all circuits and restarts. All cars and tracks are available from the start.
+Choose a car in **Garage**, then pick a circuit. All cars and tracks are unlocked.
 
-| Car | Speed | Acceleration | Steering | Drift factor |
-| --- | ---: | ---: | ---: | ---: |
-| Open-wheel racer | 14 | 11 | 2.8 | 0.78 |
-| Compact sports car | 12 | 14 | 3.2 | 0.92 |
-| Rally hatchback | 10 | 16 | 3.6 | 0.86 |
+**Controls:** WASD / arrows to drive, **R** to restart, **Escape** to return. Use the mouse or arrows and Enter for menus.
 
-The sports car is the default. Lower drift factors remove sideways velocity faster, giving stronger grip. Car definitions in `Assets/Resources/Cars/` also contain the three steering sprites, collider dimensions, and tire-emitter positions.
+Cross the finish to start timing, pass every checkpoint in order, and complete the lap. Hitting a barrier ends the run. Selection and best times save automatically; earlier-layout records remain preserved separately.
 
-## Controls and timing
+## Circuits
 
-- **WASD / arrow keys:** accelerate, reverse, and steer.
-- **R:** restart the current circuit.
-- **Escape:** return to the menu or leave the current menu screen.
-- **Mouse, keyboard, or gamepad UI controls:** browse menus and select options.
+- **Classic Circuit:** long straights and heavy-braking chicanes.
+- **Coastal Grand Prix:** fast sweepers and flowing S bends.
+- **Canyon Run:** tight, technical street-style corners.
+- **Highland Grand Prix:** fast outfield and a demanding infield.
+- **Sunset Endurance:** long straights and linked braking zones.
 
-Cross the finish in the forward direction to start timing. Pass the ordered checkpoints before crossing again to record a lap. Collisions end the run. Each car has its own best time on each track, shown in the HUD and circuit picker. Previous track-only records remain saved and are not assigned to the new cars.
+Layout inspiration: [Monza](https://www.formula1.com/en/racing/2026/italy) and [Silverstone](https://www.formula1.com/en/racing/2026/great-britain).
 
-All five circuits use the same flat road surface, pastel curbs, finish stripe, and collision-boundary system. Classic Circuit has been rebuilt as a flowing course that matches the others. Coastal Oval is wide and gentle; Canyon Run is narrower and more technical. Highland Grand Prix and Sunset Endurance are substantially larger, with longer straights, sweeping bends, wider roads, and eight timing gates. Browse the circuit picker's second page to race them.
+## Development
 
-The race HUD is a compact top strip, with no driving-control overlay during play. Controls remain available on the menus and in this README. The F1-style racer has stronger lateral grip and reduced oversteer; the other two cars retain their handling. Rebuilt Classic Circuit uses a fresh record key so old lap times remain saved without being compared against the new route.
+Use **Tools > Racing > Validate Game** to check all 15 car/track combinations. Save scene edits first. **Build Windows Development Player** creates `Builds/SundayCircuit.exe`.
 
-## Art and UI
+Tracks, previews, and minimaps share the same path definitions in `Assets/Car/CircuitTrack.cs`. The pastel theme and car definitions live in `Assets/Resources/`.
 
-The shared warm tan theme is `Assets/Resources/PastelTheme.asset`, anchored on **#D2B48C**. Scene-authored view prefabs, shared panels, buttons, vehicle, and race HUD live in `Assets/Prefabs/`. Edit these prefabs to adjust the game consistently; screens are not constructed or replaced at runtime.
-
-Three transparent sprite sheets replace the original car model. Their imagegen prompt set is recorded in `Assets/Art/Cars/README.md`. Sprite subassets reference these PNGs; keep the source textures.
-
-`Assets/Resources/TireSmoke.asset` controls smoke size, lifetime, emission, slip threshold, and linger time for all models. Smoke uses a soft unlit material, world-space simulation, and sorting between the road and car. It fades after a crash and starts clear on restart.
-
-Settings save display and volume preferences. Master volume controls the listener and fullscreen applies immediately. Separate music, effects, and camera-shake preferences remain available for systems that consume them; no separate audio buses or shake effect are included.
-
-## Validation and Windows build
-
-Use Unity's **Tools > Racing > Validate Game** for editor checks across all 15 car/track combinations, checkpoint ordering, spawn safety, smoke setup, crash state, garage selection, record isolation, and menu references. The checks restore existing selection and records. Save your scene edits before running: validation opens scenes in Single mode.
-
-Use **Tools > Racing > Build Windows Development Player** to build `Builds/SundayCircuit.exe`. Command-line equivalents:
-
-```powershell
-$unityEditor = 'C:\Program Files\Unity\Hub\Editor\6000.5.7f1\Editor\Unity.exe'
-& $unityEditor -batchmode -nographics -quit -projectPath . -executeMethod GameValidation.Run -logFile Logs/editor-validation.log
-& $unityEditor -batchmode -nographics -quit -projectPath . -executeMethod GameValidation.BuildWindows -logFile Logs/windows-build.log
-```
-
-The development player includes opt-in integration checks. Run it with `-racing-validation -racing-output <absolute-output-folder>` to exercise menu pointer and submit events, capture 1280x720 and 1920x1080 screens, cross physical checkpoints, collide with barriers, restart, and verify records. It restores selection and record preferences on completion. Normal launches never run these checks. Separate `-racing-persist-write` and `-racing-persist-read` runs verify selection across process restarts; use the same output directory for both, and always run the read step to restore the prior selection.
-
-**Tools > Racing > Rebuild Pastel Assets and Scenes** regenerates the authored setup from `RacingProjectSetup`. It replaces menu views and race HUDs and recreates Classic Circuit and the two large circuits from the common template, so use it only when intentionally rebuilding those assets. Routine play and validation do not call it.
-
-## Source control
-
-Commit `Assets/` with `.meta` files, `Packages/`, and `ProjectSettings/`. The ignore rules exclude Unity caches, builds, logs, recordings, local IDE files, and local Unity AI assistant settings. Binary art uses Git LFS through `.gitattributes`.
+Commit `Assets/` with its `.meta` files, `Packages/`, and `ProjectSettings/`. Generated caches, logs, and builds are ignored.

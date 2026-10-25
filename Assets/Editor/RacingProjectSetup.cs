@@ -284,7 +284,7 @@ public static class RacingProjectSetup
                 var item = p.gameObject.AddComponent<LevelCard>(); item.index = i;
                 item.title = Label(p, (i + 1).ToString("00") + "  " + LevelCatalog.Names[i], 0, 152, 305, 42, 21);
                 item.description = Label(p, LevelCatalog.Descriptions[i], 0, 98, 305, 58, 17);
-                item.preview = Preview(p, CarSelection.Current.straight, 0, -2, 120, 138);
+                item.preview = Map(p, LevelCatalog.Layouts[i], new Vector2(260, 134), new Vector2(0, -4), 6);
                 item.record = Label(p, "SET YOUR FIRST LAP", 0, -102, 305, 50, 15, TextAnchor.MiddleCenter);
                 var button = Button(p, "Race", 0, -158, item.Race, 300);
                 if (column == 0) menu.pageFirst[page] = button;
@@ -355,13 +355,13 @@ public static class RacingProjectSetup
     static void EnsureNewCircuits()
     {
         // Use the common circuit scene as a template, preserving each target scene's GUID.
-        foreach (var entry in new[] { (name: "Level1", layout: 2), (name: "Level4", layout: 3), (name: "Level5", layout: 4) })
+        foreach (string scene in LevelCatalog.Scenes.Where(s => s != "Level2" && s != "Level3"))
         {
             EditorSceneManager.OpenScene("Assets/Scenes/Level2.unity");
             var circuit = UnityEngine.Object.FindAnyObjectByType<CircuitTrack>();
-            circuit.layout = entry.layout;
+            circuit.layout = LevelCatalog.Layouts[Array.IndexOf(LevelCatalog.Scenes, scene)];
             EditorUtility.SetDirty(circuit);
-            EditorSceneManager.SaveScene(SceneManager.GetActiveScene(), "Assets/Scenes/" + entry.name + ".unity");
+            EditorSceneManager.SaveScene(SceneManager.GetActiveScene(), "Assets/Scenes/" + scene + ".unity");
         }
     }
 
@@ -375,6 +375,7 @@ public static class RacingProjectSetup
         var oldEvents = UnityEngine.Object.FindAnyObjectByType<EventSystem>();
         if (oldEvents != null) UnityEngine.Object.DestroyImmediate(oldEvents.gameObject);
         var events = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+        UnityEngine.Object.FindAnyObjectByType<CircuitTrack>().layout = LevelCatalog.Layouts[Array.IndexOf(LevelCatalog.Scenes, scene)];
         Camera.main.backgroundColor = theme.background;
         Camera.main.orthographicSize = 9;
         car.transform.localScale = Vector3.one;
@@ -399,6 +400,13 @@ public static class RacingProjectSetup
         var go = new GameObject(name); go.transform.SetParent(parent, false);
         var ps = go.AddComponent<ParticleSystem>(); Resources.Load<TireSmokeProfile>("TireSmoke").Apply(ps); return ps;
     }
+    static CircuitMapGraphic Map(Transform parent, int layout, Vector2 size, Vector2 position, float width)
+    {
+        var rect = Rect("Circuit Layout", parent, size, position);
+        var map = rect.gameObject.AddComponent<CircuitMapGraphic>();
+        map.theme = theme; map.lineWidth = width; map.raycastTarget = false; map.SetLayout(layout);
+        return map;
+    }
     static void BuildHud(Logic logic, string scene)
     {
         var root = new GameObject("Race HUD", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -412,6 +420,17 @@ public static class RacingProjectSetup
         var time = Label(bar, "0.00 s", 100, 0, 240, 50, 30, TextAnchor.MiddleCenter);
         var best = Label(bar, "BEST --", 345, 0, 190, 40, 18, TextAnchor.MiddleCenter);
         var status = Label(root.transform, "Cross the finish stripe to start", 0, -325, 900, 28, 18, TextAnchor.MiddleCenter);
+        var mapPanel = Panel(root.transform, "Minimap", 0, 0, 160, 140);
+        mapPanel.anchorMin = mapPanel.anchorMax = new Vector2(1, 0);
+        mapPanel.pivot = new Vector2(1, 0);
+        mapPanel.anchoredPosition = new Vector2(-18, 18);
+        mapPanel.GetComponent<Image>().raycastTarget = false;
+        hud.minimap = mapPanel.gameObject.AddComponent<RacingMinimap>();
+        hud.minimap.route = Map(mapPanel, 0, new Vector2(140, 120), Vector2.zero, 4);
+        var marker = Rect("Player Marker", hud.minimap.route.transform, new Vector2(8, 11), Vector2.zero);
+        var markerGraphic = marker.gameObject.AddComponent<PlayerMapMarker>();
+        markerGraphic.theme = theme; markerGraphic.raycastTarget = false;
+        hud.minimap.marker = marker;
         var over = Rect("Game Over", root.transform, Vector2.zero, Vector2.zero); Stretch(over);
         over.gameObject.AddComponent<Image>().color = new Color(theme.background.r, theme.background.g, theme.background.b, .84f);
         var card = Panel(over, "Run Finished Card", 0, 0, 660, 355);
@@ -425,6 +444,7 @@ public static class RacingProjectSetup
         var prefab = PrefabUtility.SaveAsPrefabAsset(root, Prefabs + "RaceHud.prefab");
         UnityEngine.Object.DestroyImmediate(root);
         var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        instance.GetComponent<RaceHud>().minimap.route.SetLayout(LevelCatalog.Layouts[Array.IndexOf(LevelCatalog.Scenes, scene)]);
         var texts = instance.GetComponentsInChildren<Text>(true);
         logic.scoreText = texts.First(t => t.gameObject.name == "0.00 s");
         logic.highScoreText = texts.First(t => t.gameObject.name == "BEST --");

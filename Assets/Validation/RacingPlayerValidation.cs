@@ -169,6 +169,12 @@ public class RacingPlayerValidation : MonoBehaviour
                 SceneManager.LoadScene(level); yield return new WaitForSeconds(.25f);
                 var car = FindAnyObjectByType<CarScript>();
                 var logic = FindAnyObjectByType<Logic>();
+                var minimap = FindAnyObjectByType<RacingMinimap>();
+                Check(minimap != null && minimap.Player == car.transform, "Minimap did not bind to current car");
+                Check(minimap.route.Layout == LevelCatalog.Layouts[Array.IndexOf(LevelCatalog.Scenes, level)], "Minimap shows wrong layout");
+                minimap.UpdateMarker();
+                Vector2 expectedPosition = minimap.route.ProjectClamped(FindAnyObjectByType<CircuitTrack>().transform.InverseTransformPoint(car.transform.position), 7);
+                Check(Vector2.Distance(minimap.marker.anchoredPosition, expectedPosition) < .01f, "Minimap marker projects incorrectly");
                 Check(car.definition == model && car.alive && logic.alive, "Wrong car or unsafe spawn: " + level + "/" + model.id);
                 Check(car.tireSmokeParticles1.particleCount == 0, "Smoke not clear on spawn");
                 Check(car.maxSpeed == model.maxSpeed && car.acceleration == model.acceleration, "Handling differs from definition");
@@ -181,6 +187,13 @@ public class RacingPlayerValidation : MonoBehaviour
                 Check(car.tireSmokeParticles1.particleCount > 0 && car.tireSmokeParticles2.particleCount > 0, "Smoke not visible");
                 Check(car.tireSmokeParticles1.GetComponent<ParticleSystemRenderer>().sharedMaterial.shader.isSupported, "Smoke material unsupported");
                 Screenshot("smoke-" + level + "-" + model.id); yield return new WaitForSeconds(.15f);
+                if (model.id == "sports")
+                {
+                    Screen.SetResolution(1920, 1080, FullScreenMode.Windowed);
+                    yield return new WaitForSeconds(.4f);
+                    Screenshot("minimap-1080-" + level); yield return new WaitForSeconds(.15f);
+                    Screen.SetResolution(1280, 720, FullScreenMode.Windowed); yield return new WaitForSeconds(.25f);
+                }
                 var gates = FindObjectsByType<RaceCheckpoint>().OrderBy(c => c.index).ToArray();
                 var finish = gates.FirstOrDefault(c => c.index == 0);
                 Vector2 finishPosition = finish != null ? (Vector2)finish.transform.position : (Vector2)FindAnyObjectByType<Trigger>().GetComponent<BoxCollider2D>().bounds.center;
@@ -201,6 +214,9 @@ public class RacingPlayerValidation : MonoBehaviour
                     Physics2D.SyncTransforms();
                     yield return new WaitForSeconds(.65f);
                     car.myRigidbody.linearVelocity = Vector2.zero;
+                    minimap.UpdateMarker();
+                    Vector2 actualMapPosition = minimap.route.ProjectClamped(FindAnyObjectByType<CircuitTrack>().transform.InverseTransformPoint(car.transform.position), 7);
+                    Check(Vector2.Distance(minimap.marker.anchoredPosition, actualMapPosition) < .01f, "Map marker stopped following car");
                     Check(logic.alive && logic.isTimerRunning, "Gate crossing failed: " + level + " / step " + gateIndex + " gate " + number + " alive=" + logic.alive + " running=" + logic.isTimerRunning + " position=" + car.myRigidbody.position);
                 }
                 Check(PlayerPrefs.GetFloat(key, 0) > 0, "Physical lap not recorded: " + level);
@@ -221,11 +237,13 @@ public class RacingPlayerValidation : MonoBehaviour
                 Screenshot("crash-" + level + "-" + model.id); yield return new WaitForSeconds(.15f);
                 Submit(logic.restartButton); yield return new WaitForSeconds(.25f);
                 Check(FindAnyObjectByType<CarScript>().definition == model && FindAnyObjectByType<Logic>().alive, "Restart lost model or run state");
+                Check(FindAnyObjectByType<RacingMinimap>().Player == FindAnyObjectByType<CarScript>().transform, "Restart retained stale minimap target");
                 Check(FindAnyObjectByType<CarScript>().tireSmokeParticles1.particleCount == 0, "Restart retained particles");
                 FindAnyObjectByType<Logic>().MainMenu(); yield return new WaitForSeconds(.25f);
                 FindAnyObjectByType<Menu>().Play();
                 FindAnyObjectByType<Menu>().ShowCircuitPageFor(Array.IndexOf(LevelCatalog.Scenes, level)); yield return null;
                 var card = FindObjectsByType<LevelCard>().Single(c => LevelCatalog.Scenes[c.index] == level);
+                Check(card.preview.Layout == LevelCatalog.Layouts[Array.IndexOf(LevelCatalog.Scenes, level)], "Menu preview differs from raced layout");
                 Check(card.record.text.Contains(lap.ToString("0.00")), "Record not shown in menu");
                 Debug.Log("PLAYER VALIDATED: " + level + " / " + model.id);
             }

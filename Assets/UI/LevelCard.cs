@@ -7,11 +7,11 @@ public class LevelCard : MonoBehaviour
     public Text title;
     public Text description;
     public Text record;
-    public Image preview;
+    public CircuitMapGraphic preview;
     void OnEnable() { Refresh(); }
     public void Refresh()
     {
-        preview.sprite = CarSelection.Current.straight;
+        preview.SetLayout(LevelCatalog.Layouts[index]);
         title.text = (index + 1).ToString("00") + "  " + LevelCatalog.Names[index];
         description.text = LevelCatalog.Descriptions[index];
         float best = PlayerPrefs.GetFloat(LevelCatalog.RecordKey(LevelCatalog.Scenes[index], CarSelection.Current.id), 0);

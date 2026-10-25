@@ -149,11 +149,11 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: '::'
   time: 0
-  scoreText: {fileID: 1960014969}
-  highScoreText: {fileID: 1960014968}
-  statusText: {fileID: 1960014972}
-  gameOverPanel: {fileID: 1960014971}
-  restartButton: {fileID: 1960014970}
+  scoreText: {fileID: 1489249671}
+  highScoreText: {fileID: 1489249670}
+  statusText: {fileID: 1489249674}
+  gameOverPanel: {fileID: 1489249673}
+  restartButton: {fileID: 1489249672}
   alive: 1
   isTimerRunning: 0
   checkpointCount: 0
@@ -172,7 +172,12 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &180918775
+--- !u!4 &347700666 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4885777453908247942, guid: 0333c90adeab4ab4ebf316b2039ffd15, type: 3}
+  m_PrefabInstance: {fileID: 8802745870198848056}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &362511499
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -180,9 +185,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 180918778}
-  - component: {fileID: 180918777}
-  - component: {fileID: 180918776}
+  - component: {fileID: 362511502}
+  - component: {fileID: 362511501}
+  - component: {fileID: 362511500}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -190,13 +195,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &180918776
+--- !u!114 &362511500
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 180918775}
+  m_GameObject: {fileID: 362511499}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
@@ -210,13 +215,13 @@ MonoBehaviour:
   m_InputActionsPerSecond: 10
   m_RepeatDelay: 0.5
   m_ForceModuleActive: 0
---- !u!114 &180918777
+--- !u!114 &362511501
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 180918775}
+  m_GameObject: {fileID: 362511499}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
@@ -225,13 +230,13 @@ MonoBehaviour:
   m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 10
---- !u!4 &180918778
+--- !u!4 &362511502
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 180918775}
+  m_GameObject: {fileID: 362511499}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -240,11 +245,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &347700666 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 4885777453908247942, guid: 0333c90adeab4ab4ebf316b2039ffd15, type: 3}
-  m_PrefabInstance: {fileID: 8802745870198848056}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -549,7 +549,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::CircuitTrack
   layout: 4
---- !u!1001 &1960014967
+--- !u!1001 &1489249669
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -637,6 +637,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3368939151736908864, guid: ccc5b82be8b8a8149948be878ba956ce, type: 3}
+      propertyPath: layout
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 7728743771363425982, guid: ccc5b82be8b8a8149948be878ba956ce, type: 3}
       propertyPath: m_Name
       value: RaceHud
@@ -646,10 +650,10 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ccc5b82be8b8a8149948be878ba956ce, type: 3}
---- !u!114 &1960014968 stripped
+--- !u!114 &1489249670 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4480378603151881529, guid: ccc5b82be8b8a8149948be878ba956ce, type: 3}
-  m_PrefabInstance: {fileID: 1960014967}
+  m_PrefabInstance: {fileID: 1489249669}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
@@ -657,10 +661,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
---- !u!114 &1960014969 stripped
+--- !u!114 &1489249671 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3894396763352746431, guid: ccc5b82be8b8a8149948be878ba956ce, type: 3}
-  m_PrefabInstance: {fileID: 1960014967}
+  m_PrefabInstance: {fileID: 1489249669}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
@@ -668,10 +672,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Text
---- !u!114 &1960014970 stripped
+--- !u!114 &1489249672 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9159515776594642125, guid: ccc5b82be8b8a8149948be878ba956ce, type: 3}
-  m_PrefabInstance: {fileID: 1960014967}
+  m_PrefabInstance: {fileID: 1489249669}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
@@ -679,15 +683,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
---- !u!1 &1960014971 stripped
+--- !u!1 &1489249673 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 871252548843479509, guid: ccc5b82be8b8a8149948be878ba956ce, type: 3}
-  m_PrefabInstance: {fileID: 1960014967}
+  m_PrefabInstance: {fileID: 1489249669}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1960014972 stripped
+--- !u!114 &1489249674 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2229363385245980825, guid: ccc5b82be8b8a8149948be878ba956ce, type: 3}
-  m_PrefabInstance: {fileID: 1960014967}
+  m_PrefabInstance: {fileID: 1489249669}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
@@ -761,5 +765,5 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 8802745870198848056}
   - {fileID: 112578135}
-  - {fileID: 180918778}
-  - {fileID: 1960014967}
+  - {fileID: 362511502}
+  - {fileID: 1489249669}
