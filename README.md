@@ -1,33 +1,46 @@
-#  Top-Down 2D Racing Game
+# Top-Down 2D Racing Game
 
-A fast-paced, 2D top-down arcade racing game built in Unity. This project features custom drift physics, dynamic particle effects, and a complete lap-timing system designed for responsive and engaging gameplay.
+A Unity arcade racer with drift handling, tire smoke, camera follow, and three time-trial circuits.
 
-<img width="1577" height="871" alt="image" src="https://github.com/user-attachments/assets/c7406944-fb04-4580-9acd-183318711d35" />
+## Run the game
 
+1. Install **Unity 6000.5.7f1** through Unity Hub (the version in `ProjectSettings/ProjectVersion.txt`).
+2. Clone this repository with Git LFS installed, then run `git lfs pull` to retrieve the sprites and fonts.
+3. Open the repository folder in Unity Hub and let Unity import the assets and packages.
+4. Open `Assets/Scenes/MainMenu.unity` and enter Play mode.
+5. Choose **Play - Select Circuit**, then pick a track. All three circuits are available immediately.
 
-##  Features
+| Circuit | Description |
+| --- | --- |
+| Classic Circuit | Original spline circuit with long straights and sweeping turns |
+| Coastal Oval | Wide, flowing oval for learning the handling |
+| Canyon Run | Narrower circuit with changing-radius bends |
 
-* **Custom Drift Physics:** Hand-tuned 2D vector physics that simulate realistic car handling, sliding, and drifting.
-* **Dynamic Visual Effects:** Custom tire smoke implemented via Unity Particle Systems that react to the car's drifting angle and speed.
-* **Lap Timing System:** Trigger-based checkpoint and lap timer logic to track player performance.
-* **Smooth Camera Tracking:** A custom 2D camera follow script that smoothly interpolates target position while maintaining the player in focus.
-* **Fully Functional UI:** Complete user interface including main menus, settings, and seamless scene transitions.
+The two new roads are generated when the scene starts, including curbs, matching collision boundaries, a white finish stripe, and four ordered timing gates. Their layouts are defined in `Assets/Car/CircuitTrack.cs`; they do not require baked mesh files. The original circuit retains its spline and collision layout.
 
-##  Core Scripts
+## Controls and timing
 
-The game's logic is driven by several key C# scripts:
-* `CarScript.cs` - Handles the core input, acceleration, steering, and 2D vector drift physics.
-* `CameraFollow2D.cs` - Manages smooth camera tracking behind the vehicle.
-* `Trigger.cs` - Detects when the car passes through finish lines or checkpoints.
-* `Logic.cs` - The core game manager handling the lap timer, score tracking, and scene transitions.
+- **WASD / arrow keys:** accelerate, reverse, and steer.
+- **R:** restart the current circuit.
+- **Escape:** return to the menu; also returns from Settings.
+- **Mouse or keyboard UI navigation:** select menu buttons and circuits.
 
-##  Getting Started
+Cross the finish line in the forward direction to start timing. Pass the checkpoints in order and cross the finish again to record a lap. The classic circuit requires its far-side checkpoint; the new tracks each require three intermediate checkpoints. Crossing the finish repeatedly or driving backwards cannot complete a lap. Each circuit saves its own fastest time, shown in the HUD and circuit picker. A collision ends the run and offers Restart and Main Menu.
 
-### Prerequisites
-* **Unity Editor:** Make sure you have a recent version of Unity installed (2022.3 LTS or newer recommended).
-* **Git:** To clone the repository.
+Settings save volume and display preferences. Master volume controls the global listener, and fullscreen changes apply immediately. Music, SFX, and camera-shake preferences are stored for systems that use them; this project currently has no separate audio buses or shake effect.
 
-### Installation
-1. Clone this repository to your local machine:
-   ```bash
-   git clone [https://github.com/DenisCrc/topdown-racing-game.git](https://github.com/DenisCrc/topdown-racing-game.git)
+## Repository contents
+
+Commit `Assets/` (including `.meta` files), `Packages/`, and `ProjectSettings/`, together with the root project documentation and Git configuration. Sprites, fonts, TextMesh Pro resources, render settings, and package lockfiles are required project inputs.
+
+`.gitignore` excludes Unity caches, build output, logs, captures, local IDE files, and local Unity AI assistant settings. Generated files already committed must be removed from the index separately; ignore rules alone do not untrack them. Binary game assets use Git LFS via `.gitattributes`.
+
+## Validation
+
+Run **Tools > Racing > Validate Game** in Unity, or run the editor from the command line:
+
+```powershell
+& 'C:\Program Files\Unity\Hub\Editor\6000.5.7f1\Editor\Unity.exe' -batchmode -nographics -quit -projectPath . -executeMethod GameValidation.Run -logFile Logs/game-validation.log
+```
+
+The validation opens all three scenes, checks build registration, road geometry, collision boundaries, HUD references, checkpoint ordering, best-time persistence, crash state, and menu navigation. It restores existing lap records. Run it with no unsaved scene edits: it opens scenes in Single mode. For a manual play check, select each track, drive a full lap, crash and restart, then return to the menu and confirm its record. Also check Settings and keyboard navigation at the target window size.

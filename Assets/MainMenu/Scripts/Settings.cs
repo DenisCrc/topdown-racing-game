@@ -4,41 +4,34 @@ using UnityEngine.SceneManagement;
 
 public class Settings : MonoBehaviour
 {
-    private bool Fullscreen = true;
-
     [SerializeField] private Slider MasterVolumeSlider;
     [SerializeField] private Slider MusicVolumeSlider;
     [SerializeField] private Slider SFXVolumeSlider;
     [SerializeField] private Toggle FullscreenToggle;
     [SerializeField] private Toggle CameraShakeToggle;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Awake()
-    {
-        Fullscreen = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
-        Screen.fullScreen = Fullscreen;
-    }
     void Start()
     {
-        MasterVolumeSlider.value = PlayerPrefs.GetFloat("MasterVolume", 0.5f);
-        MusicVolumeSlider.value = PlayerPrefs.GetFloat("MusicVolume", 0.5f);
-        SFXVolumeSlider.value = PlayerPrefs.GetFloat("SFXVolume", 0.5f);
-        FullscreenToggle.isOn = Fullscreen;
-        CameraShakeToggle.isOn = PlayerPrefs.GetInt("CameraShake", 1) == 1;
+        MasterVolumeSlider.SetValueWithoutNotify(PlayerPrefs.GetFloat("MasterVolume", 0.5f));
+        MusicVolumeSlider.SetValueWithoutNotify(PlayerPrefs.GetFloat("MusicVolume", 0.5f));
+        SFXVolumeSlider.SetValueWithoutNotify(PlayerPrefs.GetFloat("SFXVolume", 0.5f));
+        FullscreenToggle.SetIsOnWithoutNotify(PlayerPrefs.GetInt("Fullscreen", 1) == 1);
+        CameraShakeToggle.SetIsOnWithoutNotify(PlayerPrefs.GetInt("CameraShake", 1) == 1);
+        MasterVolumeSlider.onValueChanged.AddListener(SetMasterVolume);
+        MusicVolumeSlider.onValueChanged.AddListener(SetMusicVolume);
+        SFXVolumeSlider.onValueChanged.AddListener(SetSfxVolume);
+        FullscreenToggle.onValueChanged.AddListener(SetFullscreen);
+        CameraShakeToggle.onValueChanged.AddListener(SetCameraShake);
+        AudioListener.volume = MasterVolumeSlider.value;
+        Screen.fullScreen = FullscreenToggle.isOn;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        PlayerPrefs.SetFloat("MasterVolume", MasterVolumeSlider.value);
-        PlayerPrefs.SetFloat("MusicVolume", MusicVolumeSlider.value);
-        PlayerPrefs.SetFloat("SFXVolume", SFXVolumeSlider.value);
-        PlayerPrefs.SetInt("Fullscreen", FullscreenToggle.isOn ? 1 : 0);
-        PlayerPrefs.SetInt("CameraShake", CameraShakeToggle.isOn ? 1 : 0);
-    }
-
-    public void BackToMenu()
-    {
-        SceneManager.LoadScene("MainMenu");
-    }
+    void SetMasterVolume(float value) { PlayerPrefs.SetFloat("MasterVolume", value); AudioListener.volume = value; }
+    void SetMusicVolume(float value) { PlayerPrefs.SetFloat("MusicVolume", value); }
+    void SetSfxVolume(float value) { PlayerPrefs.SetFloat("SFXVolume", value); }
+    void SetFullscreen(bool value) { PlayerPrefs.SetInt("Fullscreen", value ? 1 : 0); Screen.fullScreen = value; }
+    void SetCameraShake(bool value) { PlayerPrefs.SetInt("CameraShake", value ? 1 : 0); }
+    void Update() { if (Input.GetKeyDown(KeyCode.Escape)) BackToMenu(); }
+    void OnDisable() { PlayerPrefs.Save(); }
+    public void BackToMenu() { SceneManager.LoadScene("MainMenu"); }
 }
