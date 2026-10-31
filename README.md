@@ -9,7 +9,8 @@ A pastel Unity time-trial racer with three cars, five original F1-inspired circu
 3. Open the project, load `Assets/Scenes/MainMenu.unity`, and enter Play mode.
 
 Choose a car in **Garage**, then pick a circuit. All cars and tracks are unlocked.
-<img width="968" height="540" alt="image" src="https://github.com/user-attachments/assets/19e9f240-5b5a-4408-9785-4755f1b3bac0" />
+<img width="2498" height="1531" alt="image" src="https://github.com/user-attachments/assets/c8909c30-3ad6-42f0-bc0b-701d70885c01" />
+
 
 
 **Controls:** WASD / arrows to drive, **R** to restart, **Escape** to return. Use the mouse or arrows and Enter for menus.
