@@ -1,11 +1,11 @@
-# Generated car sprites
+# Car sprites
 
-Created with the built-in imagegen tool. Each transparent PNG contains straight, left-steering, and right-steering frames, facing up. The Unity setup tool trims transparent margins and stores the three sprite subassets in the matching CarDefinition asset. Do not delete the source textures: the sprites reference them.
+Source: "2D Race Cars" by looneybits — https://opengameart.org/content/2d-race-cars — licensed CC0 (public domain).
 
-## Prompt set
+| Sheet      | Original file         | Car         |
+|------------|-----------------------|-------------|
+| racer.png  | cars/pitstop_car_1.png | Red Arrow   |
+| sports.png | cars/pitstop_car_9.png | Green Flash |
+| rally.png  | cars/pitstop_car_4.png | Blue Bolt   |
 
-For each model, generate a horizontal, three-cell, top-down sprite sheet. Keep the body fixed and facing exactly up; only the front-wheel steering changes (straight, left, right). Use soft illustrated arcade styling, crisp dark brown outlines, muted pastel paint and cream stripes. Transparent background; no ground, text, logos, or cast shadows. Center each complete car with clear margins. Match the visual treatment across the set.
-
-- racer.png: open-wheel single-seat racing car; muted coral and cream.
-- sports.png: compact closed-body sports coupe; muted sage green and cream.
-- rally.png: rally hatchback; muted dusty blue and cream.
+Each PNG is a horizontal three-cell sheet: straight, left-steering and right-steering frames, facing up, transparent background. The originals face down and have no steering art, so each frame was rotated 180° and the left/right frames were made by turning the two front wheels 18°. The Unity setup tool (`Tools/Racing/Rebuild Pastel Assets and Scenes`) trims the transparent margins with one shared rectangle and stores the three sprite subassets in the matching `Assets/Resources/Cars/*.asset`. Do not delete the source textures: the sprites reference them.
