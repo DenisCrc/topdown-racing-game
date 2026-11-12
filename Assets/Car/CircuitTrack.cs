@@ -58,39 +58,62 @@ public class CircuitTrack : MonoBehaviour
         if (index >= 0) layout = LevelCatalog.Layouts[index];
         var theme = PastelTheme.Current;
         float width = layout >= 3 ? 6.5f : layout == 0 ? 6 : layout == 2 ? 5.5f : 4.5f;
-        var vertices = new Vector3[Samples * 4];
-        var colors = new Color[vertices.Length];
-        var triangles = new int[Samples * 18];
+        float h = width / 2;
+        // Cross-section bands from one side of the track to the other: runoff, dark outline,
+        // red/white curb, white edge line, asphalt, then mirrored. The colliders stay on ±h.
+        const float Runoff = 1.1f, Outline = 0.14f, Curb = 0.5f, Line = 0.12f;
+        float[] edges = { -h - Runoff, -h - Outline, -h, -h + Curb, -h + Curb + Line,
+                           h - Curb - Line, h - Curb, h, h + Outline, h + Runoff };
+        int[] kind = { 0, 1, 2, 3, 4, 3, 2, 1, 0 };
+        // Draw order: runoff first so asphalt and curbs always sit on top where sections pass close.
+        int[] drawOrder = { 0, 8, 1, 7, 2, 6, 3, 5, 4 };
+        Color runoff = Color.Lerp(theme.accent, theme.ink, 0.12f);
+        Color curbRed = new Color32(204, 88, 72, 255);
+        Color asphalt = Color.Lerp(theme.road, theme.ink, 0.3f);
+        int bands = kind.Length;
+        var points = new Vector2[Samples];
+        var normals = new Vector2[Samples];
         var inner = new Vector2[Samples + 1];
         var outer = new Vector2[Samples + 1];
         for (int i = 0; i < Samples; i++)
         {
             float angle = i * Mathf.PI * 2 / Samples;
-            Vector2 p = Point(layout, angle);
+            points[i] = Point(layout, angle);
             Vector2 tangent = (Point(layout, angle + 0.01f) - Point(layout, angle - 0.01f)).normalized;
-            Vector2 normal = new Vector2(-tangent.y, tangent.x);
-            float[] offsets = { -width / 2, -width / 2 + 0.25f, width / 2 - 0.25f, width / 2 };
-            for (int lane = 0; lane < 4; lane++)
-            {
-                vertices[i * 4 + lane] = p + normal * offsets[lane];
-                colors[i * 4 + lane] = lane == 0 || lane == 3
-                    ? (i / 4 % 2 == 0 ? theme.panel : theme.coral)
-                    : (i == 0 ? theme.panel : theme.road);
-                // Mesh vertex colors are linear; UI and material Color properties are converted by Unity.
-                if (QualitySettings.activeColorSpace == ColorSpace.Linear)
-                    colors[i * 4 + lane] = colors[i * 4 + lane].linear;
-            }
-            outer[i] = p - normal * width / 2;
-            inner[i] = p + normal * width / 2;
-            for (int lane = 0; lane < 3; lane++)
-            {
-                int a = i * 4 + lane, b = ((i + 1) % Samples) * 4 + lane;
-                int t = i * 18 + lane * 6;
-                triangles[t] = a; triangles[t + 1] = b; triangles[t + 2] = a + 1;
-                triangles[t + 3] = a + 1; triangles[t + 4] = b; triangles[t + 5] = b + 1;
-            }
+            normals[i] = new Vector2(-tangent.y, tangent.x);
+            outer[i] = points[i] - normals[i] * h;
+            inner[i] = points[i] + normals[i] * h;
         }
         outer[Samples] = outer[0]; inner[Samples] = inner[0];
+        // One flat-coloured quad per band per segment, so stripes and edges stay crisp.
+        var vertices = new Vector3[Samples * bands * 4];
+        var colors = new Color[vertices.Length];
+        var triangles = new int[Samples * bands * 6];
+        int q = 0;
+        foreach (int band in drawOrder)
+            for (int i = 0; i < Samples; i++, q++)
+            {
+                int j = (i + 1) % Samples;
+                Color c = kind[band] switch
+                {
+                    0 => runoff,
+                    1 => theme.ink,
+                    2 => i / 4 % 2 == 0 ? theme.panel : curbRed,
+                    3 => theme.panel,
+                    _ => i < 2 ? theme.panel : asphalt,
+                };
+                // Mesh vertex colors are linear; UI and material Color properties are converted by Unity.
+                if (QualitySettings.activeColorSpace == ColorSpace.Linear) c = c.linear;
+                int v = q * 4;
+                vertices[v] = points[i] + normals[i] * edges[band];
+                vertices[v + 1] = points[i] + normals[i] * edges[band + 1];
+                vertices[v + 2] = points[j] + normals[j] * edges[band];
+                vertices[v + 3] = points[j] + normals[j] * edges[band + 1];
+                colors[v] = colors[v + 1] = colors[v + 2] = colors[v + 3] = c;
+                int t = q * 6;
+                triangles[t] = v; triangles[t + 1] = v + 2; triangles[t + 2] = v + 1;
+                triangles[t + 3] = v + 1; triangles[t + 4] = v + 2; triangles[t + 5] = v + 3;
+            }
         gameObject.AddComponent<EdgeCollider2D>().points = outer;
         gameObject.AddComponent<EdgeCollider2D>().points = inner;
         roadMesh = new Mesh { name = "Circuit Road", vertices = vertices, triangles = triangles, colors = colors };

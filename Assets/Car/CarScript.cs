@@ -65,15 +65,26 @@ public class CarScript : MonoBehaviour
     {
         if (!alive) return;
         float forwardSpeed = Vector2.Dot(transform.up, myRigidbody.linearVelocity);
+        float speedRatio = Mathf.Clamp01(Mathf.Abs(forwardSpeed) / maxSpeed);
+        // Braking (input against the direction of travel) bites harder than the throttle.
+        bool braking = Mathf.Abs(forwardSpeed) > 0.5f && accelerationInput * forwardSpeed < 0;
+        float force = acceleration * (braking ? 1.6f : 1);
         if (!((forwardSpeed > maxSpeed && accelerationInput > 0) || (forwardSpeed < -maxSpeed * 0.5f && accelerationInput < 0)))
-            myRigidbody.AddForce(transform.up * accelerationInput * acceleration);
+            myRigidbody.AddForce(transform.up * accelerationInput * force);
+        // Engine braking when coasting, so lifting off is a useful way to set up a corner.
+        myRigidbody.linearDamping = Mathf.Abs(accelerationInput) < 0.05f ? 0.9f : 0.5f;
         Vector2 forward = transform.up * Vector2.Dot(myRigidbody.linearVelocity, transform.up);
         Vector2 sideways = transform.right * Vector2.Dot(myRigidbody.linearVelocity, transform.right);
-        myRigidbody.linearVelocity = forward + sideways * driftfactor;
+        // Tyres grip fully at low speed; the car's own slide only appears as speed builds.
+        float grip = Mathf.Lerp(Mathf.Min(driftfactor, 0.6f), driftfactor, speedRatio);
+        myRigidbody.linearVelocity = forward + sideways * grip;
         float turning = Mathf.Clamp01(myRigidbody.linearVelocity.magnitude / 8);
-        float direction = Vector2.Dot(myRigidbody.linearVelocity, transform.up) >= 0 ? 1 : -1;
+        // Less steering lock at top speed so fast sections don't snap the car around.
+        float steer = turnfactor * Mathf.Lerp(1f, 0.65f, speedRatio);
+        float direction = forwardSpeed >= 0 ? 1 : -1;
         float slip = Vector2.Dot(myRigidbody.linearVelocity, transform.right);
-        myRigidbody.MoveRotation(myRigidbody.rotation - (turnInput * turnfactor - slip * oversteerFactor) * turning * direction);
+        float oversteer = Mathf.Clamp(slip * oversteerFactor, -turnfactor, turnfactor);
+        myRigidbody.MoveRotation(myRigidbody.rotation - (turnInput * steer - oversteer) * turning * direction);
         UpdateSmoke(Mathf.Abs(slip));
     }
     public void UpdateSmoke(float slip)

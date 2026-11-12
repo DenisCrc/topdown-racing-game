@@ -54,11 +54,12 @@ public static class RacingProjectSetup
     static void BuildCars()
     {
         string[] ids = { "racer", "sports", "rally" };
-        string[] names = { "Open-wheel racer", "Compact sports car", "Rally hatchback" };
-        string[] descriptions = { "Planted at speed. Strong grip for fast, precise lines.",
-            "A playful all-rounder. Quick acceleration with a little extra slide.",
-            "Short, nimble and sure-footed. Strong grip for the tightest bends." };
-        float[] speed = { 14, 12, 10 }, acceleration = { 11, 14, 16 }, steering = { 2.8f, 3.2f, 3.6f }, drift = { .78f, .92f, .86f };
+        string[] names = { "Red Arrow", "Green Flash", "Blue Bolt" };
+        string[] descriptions = { "Fastest in a straight line. Planted at speed, but needs room to turn.",
+            "A playful all-rounder. Quick off the line with a little extra slide.",
+            "Short-geared and sure-footed. The most grip for the tightest bends." };
+        float[] speed = { 15, 13, 11.5f }, acceleration = { 12, 14, 16 }, steering = { 2.9f, 3.3f, 3.7f }, drift = { .8f, .9f, .84f };
+        float[] oversteer = { .2f, .45f, .3f };
         for (int i = 0; i < ids.Length; i++)
         {
             string path = "Assets/Art/Cars/" + ids[i] + ".png";
@@ -79,24 +80,31 @@ public static class RacingProjectSetup
                 AssetDatabase.CreateAsset(car, assetPath);
             }
             car.id = ids[i]; car.displayName = names[i]; car.description = descriptions[i]; car.order = i;
-            car.maxSpeed = speed[i]; car.acceleration = acceleration[i]; car.steering = steering[i]; car.driftFactor = drift[i]; car.oversteerFactor = i == 0 ? .2f : .5f;
-            car.colliderSize = new Vector2(i == 0 ? .9f : .72f, 1.35f);
-            car.leftTire = new Vector2(i == 0 ? -.39f : -.32f, -.5f);
+            car.maxSpeed = speed[i]; car.acceleration = acceleration[i]; car.steering = steering[i]; car.driftFactor = drift[i]; car.oversteerFactor = oversteer[i];
+            // Open-wheel sprites (CC0, looneybits): collider covers the body between the wheels.
+            car.colliderSize = new Vector2(.58f, 1.4f);
+            car.colliderOffset = Vector2.zero;
+            car.leftTire = new Vector2(-.21f, -.53f);
             car.rightTire = new Vector2(-car.leftTire.x, car.leftTire.y);
-            // Keep existing sprite subassets stable when rerunning the setup tool.
-            if (car.straight == null)
+            // One trim rectangle (in cell space) shared by all three frames, so the car
+            // doesn't shift sideways when the steering frame changes.
+            var pixels = texture.GetPixels32();
+            int cell = texture.width / 3;
+            int minX = cell, maxX = 0, minY = texture.height, maxY = 0;
+            for (int y = 0; y < texture.height; y++)
+                for (int x = 0; x < texture.width; x++)
+                    if (pixels[y * texture.width + x].a > 32)
+                    { int cx = x % cell; minX = Math.Min(minX, cx); maxX = Math.Max(maxX, cx); minY = Math.Min(minY, y); maxY = Math.Max(maxY, y); }
+            var cellRect = new Rect(minX, minY, maxX - minX + 1, maxY - minY + 1);
+            // Keep existing sprite subassets stable when rerunning the setup tool; rebuild them when the art changes.
+            if (car.straight == null || car.straight.texture != texture || car.straight.rect != cellRect)
             {
-                var pixels = texture.GetPixels32();
+                foreach (var old in AssetDatabase.LoadAllAssetRepresentationsAtPath(assetPath).OfType<Sprite>())
+                    AssetDatabase.RemoveObjectFromAsset(old);
                 Sprite[] sprites = new Sprite[3];
-                int cell = texture.width / 3;
                 for (int frame = 0; frame < 3; frame++)
                 {
-                    int minX = (frame + 1) * cell, maxX = frame * cell, minY = texture.height, maxY = 0;
-                    for (int y = 0; y < texture.height; y++)
-                        for (int x = frame * cell; x < (frame + 1) * cell; x++)
-                            if (pixels[y * texture.width + x].a > 32)
-                            { minX = Math.Min(minX, x); maxX = Math.Max(maxX, x); minY = Math.Min(minY, y); maxY = Math.Max(maxY, y); }
-                    var rect = new Rect(minX, minY, maxX - minX + 1, maxY - minY + 1);
+                    var rect = new Rect(cellRect.x + frame * cell, cellRect.y, cellRect.width, cellRect.height);
                     sprites[frame] = Sprite.Create(texture, rect, new Vector2(.5f, .5f), rect.height / 1.5f, 0, SpriteMeshType.FullRect);
                     sprites[frame].name = ids[i] + new[] { "-straight", "-left", "-right" }[frame];
                     AssetDatabase.AddObjectToAsset(sprites[frame], car);
@@ -292,7 +300,7 @@ public static class RacingProjectSetup
         var display = Panel(panel, "Preview Plinth", -300, 0, 430, 338); display.GetComponent<Image>().color = theme.blue;
         garage.preview = Preview(display, CarSelection.Current.straight, 0, 10, 220, 270);
         garage.counter = Label(display, "01 / 03", 0, -142, 330, 30, 17, TextAnchor.MiddleCenter);
-        garage.carName = Label(panel, "Compact sports car", 228, 132, 495, 50, 32);
+        garage.carName = Label(panel, "Green Flash", 228, 132, 495, 50, 32);
         garage.description = Label(panel, "Description", 228, 72, 495, 70, 19);
         garage.stats = Label(panel, "Handling", 228, -39, 495, 136, 22);
         garage.selection = Label(panel, "SELECTED FOR EVERY CIRCUIT", 228, -146, 495, 32, 16);
