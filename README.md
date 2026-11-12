@@ -30,4 +30,6 @@ Use **Tools > Racing > Validate Game** to check all 15 car/track combinations. S
 
 Tracks, previews, and minimaps share the same path definitions in `Assets/Car/CircuitTrack.cs`. The pastel theme and car definitions live in `Assets/Resources/`.
 
+Car sprites: "2D Race Cars" by looneybits ([OpenGameArt](https://opengameart.org/content/2d-race-cars), CC0). See `Assets/Art/Cars/README.md`.
+
 Commit `Assets/` with its `.meta` files, `Packages/`, and `ProjectSettings/`. Generated caches, logs, and builds are ignored.
