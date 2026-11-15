@@ -1,7 +1,6 @@
 # Sunday Circuit
 
 A pastel Unity time-trial racer with three cars, five original F1-inspired circuits, drift smoke, a live minimap, and per-car lap records.
-<img width="2498" height="1531" alt="image" src="https://github.com/user-attachments/assets/c8909c30-3ad6-42f0-bc0b-701d70885c01" />
 
 ## Play
 
